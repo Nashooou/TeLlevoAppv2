@@ -17,9 +17,13 @@ export class InicioPage implements OnInit {
   // Variables
   par_username: string = "Login";
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    console.log('PASO POR CONSTRUCTOR')
+  }
 
   ngOnInit() {
+    
+    console.log('Pasó por nginit')
     // Obtener objeto de localStorage
     const usuariosObj = localStorage.getItem("usuarios"); // Cambiado a "usuarios"
 

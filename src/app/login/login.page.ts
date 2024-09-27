@@ -1,9 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
+
+
 
 @Component({
   selector: 'app-login',
@@ -16,6 +18,7 @@ import { Router, RouterLink } from '@angular/router';
     FormsModule, 
     FormsModule,
     ReactiveFormsModule,
+    
     RouterLink]
 })
 export class LoginPage {
@@ -24,8 +27,16 @@ export class LoginPage {
 
   @ViewChild('logo', {read:ElementRef}) logo?:ElementRef<HTMLImageElement>;
   @ViewChild('text', {read:ElementRef}) text?:ElementRef<HTMLImageElement>;
+  
+  // OUTPUT PERMITE COMPARTIR DATOS DESDE UN COMPONENTE HIJO A UN PADRE POR MEDIO DE EMISIÓN DE EVENTOS
+  @Output() datosAlPadre = new EventEmitter<boolean>();
 
-  constructor(private fb:FormBuilder, private router:Router, private alertController:AlertController) { 
+  constructor(
+    private fb:FormBuilder, 
+    private router:Router, 
+    private alertController:AlertController,
+    
+  ) { 
     this.loginForm = this.fb.group({
 
       correo: ['', [
@@ -88,8 +99,13 @@ export class LoginPage {
     if (usuarioEncontrado) {
       // Marcar este usuario como el que inició sesión
         usuarios.forEach((u: any) => u.ultimoUsuario = false); // Resetear otros usuarios
+
         usuarioEncontrado.ultimoUsuario = true; // Marcar este usuario
+
         localStorage.setItem('usuarios', JSON.stringify(usuarios)); // Guardar cambios
+        
+        //ESTA ES LA VARIABLE O FORMA DE EMITIR EL VALOR TRUE AL COMPONENTE "PADRE"
+        this.datosAlPadre.emit(true);
 
         this.router.navigate(['/inicio'], { queryParams: { nombre_usuario: usuarioEncontrado.nombre } });
 
