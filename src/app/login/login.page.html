@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Te Llevo App</ion-title>
+  </ion-toolbar>
+  <ion-toolbar >
+    <div class="logo-container"   >
+      <img #logo  src="assets/icon/logoduocuc.png" alt="logotipo de la Empresa" class="logo" />
+    </div>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  
+
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Inicio de Sesión</ion-card-title>
+        <ion-card-subtitle>TeLlevoApp</ion-card-subtitle>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <div class="form-group">
+          
+          <ion-item>
+            <ion-input formControlName="correo" label="Correo Electrónico" label-placement="floating" fill="outline" placeholder="Correo"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched">
+            Debes ingresar un correo válido.
+          </div>
+
+          <ion-item>
+            <ion-input formControlName="password" label="Contraseña" label-placement="floating" type="password" fill="outline" placeholder="Contraseña" maxlength="8"></ion-input>  
+          </ion-item>
+        </div>
+      
+        <div *ngIf="(loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched) || loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Favor ingresar credenciales válidas. <br>
+          - Recuerda ingresar sólo números en la Contraseña
+        </div>
+        
+        <ion-label [routerLink]="['/recuperar-contrasena']"><a>Recuperar contraseña</a></ion-label>
+      
+        <ion-button expand="block" type="submit">Ingresar</ion-button>
+        <ion-button expand="block" [routerLink]="['/registro-usuario']" >Registrarse</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </form>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary">
+    <ion-title>Duoc UC - 2024</ion-title>
+  </ion-toolbar>
+</ion-footer>

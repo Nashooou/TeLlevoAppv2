@@ -1,0 +1,70 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Te Llevo App</ion-title>
+  </ion-toolbar>
+  <ion-toolbar >
+    <div class="logo-container"   >
+      <img #logo  src="assets/icon/logoduocuc.png" alt="logotipo de la Empresa" class="logo" />
+    </div>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <form [formGroup]="recuperaForm" (ngSubmit)="recuperar()">
+    
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Recuperar Contraseña</ion-card-title>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <div class="form-group">
+          <ion-item>
+            <ion-input formControlName="correo" label="Correo electrónico" label-placement="floating" fill="outline" placeholder="Correo Electrónico"></ion-input>
+          </ion-item>
+      
+        </div>
+
+        <br>
+
+        <div *ngIf="(recuperaForm.get('correo')?.invalid && recuperaForm.get('correo')?.touched)">
+          Favor ingresar correo válido.
+        </div>
+        
+        
+        <div>
+          <ion-item>
+            <ion-input formControlName="nuevaContrasena" label="Nueva Contraseña" label-placement="floating" fill="outline" type="password" placeholder="Nueva Contraseña"></ion-input>
+          </ion-item>
+        </div>
+        
+        <div *ngIf="recuperaForm.get('password')?.invalid && recuperaForm.get('password')?.touched">
+          Ingresa una contraseña válida.
+        </div>
+
+        <div>
+          <ion-item>
+            <ion-input formControlName="nuevaContrasena2" label="Confirmar Contraseña" label-placement="floating" fill="outline" type="password" placeholder="Confirmar Contraseña"></ion-input>
+          </ion-item>
+        </div>
+
+        <div *ngIf="recuperaForm.errors?.['passwordMismatch'] && recuperaForm.get('password2')?.touched">
+          Las contraseñas no coinciden.
+        </div>
+
+        <ion-button expand="block" type="submit">Recuperar</ion-button>
+        <ion-button [routerLink]="['/login']" expand="block">Volver</ion-button>
+
+      </ion-card-content>
+    </ion-card>
+  </form>
+  
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary">
+    <ion-title>Duoc UC - 2024</ion-title>
+  </ion-toolbar>
+</ion-footer>

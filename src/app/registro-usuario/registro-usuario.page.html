@@ -1,0 +1,84 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Te Llevo App</ion-title>
+  </ion-toolbar>
+  <ion-toolbar >
+    <div class="logo-container"   >
+      <img #logo  src="assets/icon/logoduocuc.png" alt="logotipo de la Empresa" class="logo" />
+    </div>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="registraForm" (ngSubmit)="onRegister()">
+    
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Registrarse en TeLlevoApp</ion-card-title>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <div>
+          <ion-item>
+            <ion-input formControlName="nombre" label="Nombre" label-placement="floating" fill="outline" placeholder="Nombre"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraForm.get('nombre')?.invalid && registraForm.get('nombre')?.touched">
+            Ingresa un nombre válido.
+          </div>
+
+          <ion-item>
+            <ion-input formControlName="apellido" label="Apellido" label-placement="floating" fill="outline" placeholder="Apellido"></ion-input>
+          </ion-item>
+
+          <div *ngIf="registraForm.get('apellido')?.invalid && registraForm.get('apellido')?.touched">
+            Ingresa un apellido válido.
+          </div>
+
+          <ion-item>
+            <ion-input formControlName="username" label="Usuario" label-placement="floating" fill="outline" placeholder="Usuario"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraForm.get('username')?.invalid && registraForm.get('username')?.touched">
+            Ingresa un nombre de usuario válido.
+          </div>
+
+          <ion-item>
+            <ion-input formControlName="correo" label="Correo Electrónico" label-placement="floating" fill="outline" placeholder="Correo"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraForm.get('correo')?.invalid && registraForm.get('correo')?.touched">
+            Debes ingresar tu correo institucional.
+          </div>
+
+          <ion-item>
+            <ion-input formControlName="password" label="Contraseña" label-placement="floating" type="password" fill="outline" placeholder="Contraseña"></ion-input>  
+          </ion-item>
+          
+          <div *ngIf="registraForm.get('password')?.invalid && registraForm.get('password')?.touched">
+            Ingresa una contraseña válida.
+          </div>
+
+          <ion-item>
+            <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="outline" placeholder="Confirmar contraseña"></ion-input>  
+          </ion-item>
+
+          <div *ngIf="registraForm.errors?.['passwordMismatch'] && registraForm.get('password2')?.touched">
+            Las contraseñas no coinciden.
+          </div>
+
+        </div>
+
+        <ion-button expand="block" type="submit" [disabled]="registraForm.invalid">Registrar</ion-button>
+        <ion-button [routerLink]="['/login']" expand="block">Volver</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </form>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary">
+    <ion-title>Duoc UC - 2024</ion-title>
+  </ion-toolbar>
+</ion-footer>
