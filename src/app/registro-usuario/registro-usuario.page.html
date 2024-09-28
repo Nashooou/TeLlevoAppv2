@@ -70,8 +70,15 @@
 
         </div>
 
-        <ion-button expand="block" type="submit" [disabled]="registraForm.invalid">Registrar</ion-button>
-        <ion-button [routerLink]="['/login']" expand="block">Volver</ion-button>
+        <div id="error" *ngIf="(registraForm.invalid)">
+          <p>
+            Favor ingresar credenciales válidas. <br>
+          - Recuerda ingresar sólo números en la Contraseña
+          </p>
+        </div>
+
+        <ion-button color="warning" shape="round" expand="block" type="submit">Registrar</ion-button>
+        <ion-button color="secondary" shape="round" [routerLink]="['/login']" expand="block">Volver</ion-button>
       </ion-card-content>
     </ion-card>
   </form>

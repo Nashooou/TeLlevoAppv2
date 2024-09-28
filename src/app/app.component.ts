@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+
 import { IonApp, IonSplitPane, IonMenu, IonContent, IonList, IonListHeader, IonNote, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, trashOutline, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp } from 'ionicons/icons';
+import { home, personCircleSharp, logOut, gridSharp } from 'ionicons/icons';
 
 import { LoginPage } from './login/login.page';
 
@@ -38,7 +38,13 @@ export class AppComponent {
 
   constructor(private router: Router) {
     // this.showMenu = false;
-    console.log('FALSO EN CONSTRUCTOR app components');
+    // Registro de íconos
+    
+    addIcons({
+      'home': home,
+      'person' : personCircleSharp,
+      'logout': logOut
+    });
   
   }
 

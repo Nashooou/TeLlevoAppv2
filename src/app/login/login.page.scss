@@ -2,3 +2,17 @@
 #error{
   color: red;
 }
+
+.form-group{
+  padding: 5px;
+  margin: 10px;
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: center; /* Centra los botones horizontalmente */
+  align-content: center;
+  gap: 10px; /* Espacio entre los botones, puedes ajustar este valor */
+  margin-top: 20px; /* Espacio superior opcional */
+}

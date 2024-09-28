@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { add, car, create, createOutline, personCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-perfil-usuario',
@@ -23,7 +25,15 @@ export class PerfilUsuarioPage implements OnInit {
 
   constructor(
     private router: Router
-  ) {}
+  ) {
+    
+    addIcons({
+      'editar': createOutline,
+      'person': personCircle,
+      'car' : car,
+      'add' :add
+    });
+  }
 
   ngOnInit() {
     // Obtener los datos de todos los usuarios desde localStorage

@@ -3,68 +3,102 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Mi Perfil</ion-title>
+    <ion-item>
+      <ion-title style="color: white;">Mi Perfil</ion-title>
+      <ion-icon name="person" color="light" size="large"></ion-icon>
+    </ion-item>
+    
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="recuadro">
-    <!-- Título para los datos del usuario -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Información del Alumno</ion-card-title>
-      </ion-card-header>
 
-      <ion-card-content>
-        <ion-list>
-          <ion-item>
-            <ion-label>Nombre:</ion-label>
-            <ion-text>{{ usuario?.nombre }} {{ usuario?.apellido }}</ion-text>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label>Correo:</ion-label>
-            <ion-text>{{ usuario?.correo }}</ion-text>
-          </ion-item>
-          <ion-item>
-            <ion-label>Usuario:</ion-label>
-            <ion-text>{{ usuario?.username }}</ion-text>
-          </ion-item>
-          
-        </ion-list>
-        <ion-button [routerLink]="['/editaperfil']" expand="block">Editar</ion-button>
-      </ion-card-content>
+  
+  <ion-card>
+    <ion-grid>
+      <ion-card-header>
+        <ion-item>
+          <ion-card-title>Datos del Alumno</ion-card-title>
+          <ion-icon name="person" slot="end" color="primary" size="large"></ion-icon>
+        </ion-item>
+      </ion-card-header>
       
-    </ion-card>
+      <ion-card-content>
+        <ion-row>
+          <ion-col>
+            <div class="infoapp">
+              <ion-list>
+                <ion-item>
+                  <ion-label>Nombre:</ion-label>
+                  <ion-text>{{ usuario?.nombre }} {{ usuario?.apellido }}</ion-text>
+                </ion-item>
+                
+                <ion-item>
+                  <ion-label>Correo:</ion-label>
+                  <ion-text>{{ usuario?.correo }}</ion-text>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Usuario:</ion-label>
+                  <ion-text>{{ usuario?.username }}</ion-text>
+                </ion-item>
+                
+              </ion-list>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+        
+      <ion-fab horizontal="end" vertical="bottom">
+        <ion-fab-button color="warning">
+          <ion-icon name="editar" size="large" [routerLink]="['/editaperfil']"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-grid>
+  </ion-card>
+    
 
-    <!-- Título para información adicional de la app -->
-    <ion-card>
+  <ion-card>
+    <ion-grid>
+
       <ion-card-header>
-        <ion-card-title>Información del Vehículo</ion-card-title>
+        <ion-item>
+          <ion-card-title>Registro de Vehículo</ion-card-title>
+          <ion-icon name="car" slot="end" color="primary" size="large"></ion-icon>
+        </ion-item>
       </ion-card-header>
 
       <ion-card-content>
-        <div class="infoapp">
-          <ion-list>
-            <ion-item>
-              <ion-label>Marca:</ion-label>
-              <ion-text>Kia</ion-text>
-            </ion-item>
-            <ion-item>
-              <ion-label>Modelo:</ion-label>
-              <ion-text>0</ion-text>
-            </ion-item>
-            <ion-item>
-              <ion-label>Año:</ion-label>
-              <ion-text>2020</ion-text>
-            </ion-item>
-          </ion-list>
-          
-        </div>
+        <ion-row>
+          <ion-col>
+            <div class="infoapp">
+              <ion-list>
+                <ion-item>
+                  <ion-label>Marca:</ion-label>
+                  <ion-text>Kia</ion-text>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Modelo:</ion-label>
+                  <ion-text>0</ion-text>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Año:</ion-label>
+                  <ion-text>2020</ion-text>
+                </ion-item>
+              </ion-list>
+            </div>    
+          </ion-col>
+        </ion-row>
+        
       </ion-card-content>
-      <ion-button expand="block">Editar</ion-button>
-    </ion-card>
-  </div>
+
+      <ion-fab horizontal="end" vertical="bottom">
+        <ion-fab-button color="warning">
+          <ion-icon name="add" size="large"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-grid>
+    
+  </ion-card>
 </ion-content>
 
 <ion-footer>

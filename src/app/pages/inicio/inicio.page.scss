@@ -3,4 +3,8 @@
       justify-content: center;  // Centra horizontalmente
       align-items: center;      // Centra verticalmente
       height: 100%;   
-    }
+}
+
+ion-item {
+  --background: transparent; /* Eliminar el fondo por defecto de ion-item */
+}

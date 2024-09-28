@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { home } from 'ionicons/icons';
 
 @Component({
   selector: 'app-inicio',
@@ -19,6 +21,10 @@ export class InicioPage implements OnInit {
 
   constructor(private router: Router) {
     console.log('PASO POR CONSTRUCTOR inicio')
+
+    addIcons({
+      'home':home
+    });
   }
 
   ngOnInit() {
