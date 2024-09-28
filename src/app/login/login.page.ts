@@ -73,7 +73,7 @@ export class LoginPage {
     }
   
     const f = this.loginForm.value;
-    const usuariosString: any = localStorage.getItem('usuarios'); 
+    const usuariosString = localStorage.getItem('usuarios'); 
   
     if (!usuariosString) {
       // Si no hay usuario almacenado en localStorage
@@ -88,12 +88,15 @@ export class LoginPage {
   
     const usuarios = JSON.parse(usuariosString);
     
+    // Aquí puedes obtener el nombre del último usuario que inició sesión
+    // Si necesitas obtener un usuario específico, deberías pasar la lógica de identificación
+    // const usuarioAutenticado = usuarios.find((usuario: any) => usuario.ultimoUsuario === true);
+
+    
     // Validar que el usuario y la contraseña coincidan con algún usuario almacenado
     const usuarioEncontrado = usuarios.find((usuario: any) => 
       usuario.correo === f.correo && usuario.password === f.password
     );
-
-
 
     // Validar que el nombre de usuario y la contraseña coincidan
     if (usuarioEncontrado) {
@@ -118,6 +121,10 @@ export class LoginPage {
       });
       await alert.present();
     }
+
+
+    
+    
   }
   
 

@@ -1,12 +1,12 @@
 <ion-app>
-  <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
+  <ion-split-pane contentId="main-content" >
+    <ion-menu contentId="main-content" type="overlay"  *ngIf="showMenu">
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header>Menú Principal</ion-list-header>
           <ion-note>TeLlevoApp</ion-note>
 
-          <ion-menu-toggle auto-hide="false"  *ngIf="showMenu"> 
+          <ion-menu-toggle auto-hide="false"> 
             <ion-item (click)="clickOpcionMenu('')" routerLink="inicio" lines="none" detail="false" routerLinkActive="selected">
               <ion-label>Inicio</ion-label>
             </ion-item>

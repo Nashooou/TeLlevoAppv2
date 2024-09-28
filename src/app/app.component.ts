@@ -34,10 +34,11 @@ import { LoginPage } from './login/login.page';
 })
 export class AppComponent {
   showMenu: boolean = false;
+  
 
   constructor(private router: Router) {
-    this.showMenu = false;
-    
+    // this.showMenu = false;
+    console.log('FALSO EN CONSTRUCTOR app components');
   
   }
 

@@ -1,0 +1,66 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Editar Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true">
+  <div class="recuadro">
+    <form [formGroup]="editaFormAlumno" (ngSubmit)="guardarCambios()">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Editar Perfil</ion-card-title>
+        </ion-card-header>
+      
+        <ion-card-content>
+          <ion-list>
+            <ion-item>
+              <ion-label>Nombre:</ion-label>
+              <ion-text>{{ usuario?.nombre }} {{ usuario?.apellido }}</ion-text>
+            </ion-item>
+  
+            <ion-item>
+              <ion-label>Usuario:</ion-label>
+              <ion-text>{{ usuario?.username }}</ion-text>
+            </ion-item>
+  
+            <ion-item>
+              <ion-label>Correo Electrónico:</ion-label>
+              <ion-text>{{ usuario?.correo }}</ion-text>
+            </ion-item>
+            
+            
+            <ion-item>
+              <ion-input formControlName="currentPassword" label="Actual Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Actual contraseña"></ion-input>  
+            </ion-item>
+            
+            <div *ngIf="editaFormAlumno.get('currentPassword')?.invalid && editaFormAlumno.get('currentPassword')?.touched">
+              Ingresa una contraseña válida.
+            </div>
+
+            <ion-item>
+              <ion-input formControlName="password" label="Nueva Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Nueva contraseña"></ion-input>  
+            </ion-item>
+            
+            <div *ngIf="editaFormAlumno.get('password')?.invalid && editaFormAlumno.get('password')?.touched">
+              Ingresa una contraseña válida.
+            </div>
+  
+            <ion-item>
+              <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Confirmar contraseña"></ion-input>  
+            </ion-item>
+  
+          </ion-list>
+  
+          <ion-button expand="block" type="submit">Aceptar cambios</ion-button>
+          <ion-button [routerLink]="['/perfil-usuario']" expand="block">Volver</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </form>
+  </div>
+  
+</ion-content>

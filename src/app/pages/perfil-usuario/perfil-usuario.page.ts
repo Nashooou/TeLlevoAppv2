@@ -3,19 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-perfil-usuario',
   templateUrl: './perfil-usuario.page.html',
   styleUrls: ['./perfil-usuario.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    IonicModule, 
+    CommonModule, 
+    FormsModule,
+    RouterLink
+  ]
 })
 export class PerfilUsuarioPage implements OnInit {
   usuario: any = {}; // Declara la variable usuario
   
 
-  constructor() {}
+  constructor(
+    private router: Router
+  ) {}
 
   ngOnInit() {
     // Obtener los datos de todos los usuarios desde localStorage

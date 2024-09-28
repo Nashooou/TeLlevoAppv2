@@ -7,5 +7,7 @@ export const routes: Routes = [
   { path: 'registro-usuario', loadComponent: () => import('./registro-usuario/registro-usuario.page').then( m => m.RegistroUsuarioPage)},
   { path: 'recuperar-contrasena', loadComponent: () => import('./recuperar-contrasena/recuperar-contrasena.page').then( m => m.RecuperarContrasenaPage)},
   { path: 'perfil-usuario', loadComponent: () => import('./pages/perfil-usuario/perfil-usuario.page').then( m => m.PerfilUsuarioPage)},
+  { path: 'editaperfil', loadComponent: () => import('./pages/crud/editaperfil/editaperfil.page').then( m => m.EditaperfilPage)},
+
 
 ];

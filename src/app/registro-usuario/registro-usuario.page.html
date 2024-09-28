@@ -21,7 +21,7 @@
       <ion-card-content>
         <div>
           <ion-item>
-            <ion-input formControlName="nombre" label="Nombre" label-placement="floating" fill="outline" placeholder="Nombre"></ion-input>
+            <ion-input formControlName="nombre" label="Nombre" label-placement="floating" fill="undefined" placeholder="Nombre"></ion-input>
           </ion-item>
           
           <div *ngIf="registraForm.get('nombre')?.invalid && registraForm.get('nombre')?.touched">
@@ -29,7 +29,7 @@
           </div>
 
           <ion-item>
-            <ion-input formControlName="apellido" label="Apellido" label-placement="floating" fill="outline" placeholder="Apellido"></ion-input>
+            <ion-input formControlName="apellido" label="Apellido" label-placement="floating" fill="undefined" placeholder="Apellido"></ion-input>
           </ion-item>
 
           <div *ngIf="registraForm.get('apellido')?.invalid && registraForm.get('apellido')?.touched">
@@ -37,7 +37,7 @@
           </div>
 
           <ion-item>
-            <ion-input formControlName="username" label="Usuario" label-placement="floating" fill="outline" placeholder="Usuario"></ion-input>
+            <ion-input formControlName="username" label="Usuario" label-placement="floating" fill="undefined" placeholder="Usuario"></ion-input>
           </ion-item>
           
           <div *ngIf="registraForm.get('username')?.invalid && registraForm.get('username')?.touched">
@@ -45,7 +45,7 @@
           </div>
 
           <ion-item>
-            <ion-input formControlName="correo" label="Correo Electrónico" label-placement="floating" fill="outline" placeholder="Correo"></ion-input>
+            <ion-input formControlName="correo" label="Correo Electrónico" label-placement="floating" fill="undefined" placeholder="Correo"></ion-input>
           </ion-item>
           
           <div *ngIf="registraForm.get('correo')?.invalid && registraForm.get('correo')?.touched">
@@ -53,7 +53,7 @@
           </div>
 
           <ion-item>
-            <ion-input formControlName="password" label="Contraseña" label-placement="floating" type="password" fill="outline" placeholder="Contraseña"></ion-input>  
+            <ion-input formControlName="password" label="Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Contraseña"></ion-input>  
           </ion-item>
           
           <div *ngIf="registraForm.get('password')?.invalid && registraForm.get('password')?.touched">
@@ -61,7 +61,7 @@
           </div>
 
           <ion-item>
-            <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="outline" placeholder="Confirmar contraseña"></ion-input>  
+            <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Confirmar contraseña"></ion-input>  
           </ion-item>
 
           <div *ngIf="registraForm.errors?.['passwordMismatch'] && registraForm.get('password2')?.touched">
