@@ -54,8 +54,11 @@
           Las contraseñas no coinciden.
         </div>
 
-        <ion-button expand="block" type="submit">Recuperar</ion-button>
-        <ion-button [routerLink]="['/login']" expand="block">Volver</ion-button>
+        <div class="button-container">
+          <ion-button color="warning" shape="round" type="submit">Recuperar</ion-button>
+          <ion-button color="secondary" shape="round" [routerLink]="['/login']">Volver</ion-button>
+        </div>
+        
 
       </ion-card-content>
     </ion-card>
