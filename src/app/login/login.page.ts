@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
+import { UserService } from '../services/userService/user-service.service';
 
 
 
@@ -35,7 +36,7 @@ export class LoginPage {
     private fb:FormBuilder, 
     private router:Router, 
     private alertController:AlertController,
-    
+    private userService:UserService
   ) { 
     this.loginForm = this.fb.group({
 
@@ -61,6 +62,7 @@ export class LoginPage {
 
 
   async onLogin() {
+    //Error si el formulario es inválido
     if (this.loginForm.invalid) {
       // Si el formulario es inválido, mostrar un mensaje y no hacer nada
       const alert = await this.alertController.create({
@@ -72,10 +74,10 @@ export class LoginPage {
       return;
     }
   
-    const f = this.loginForm.value;
-    const usuariosString = localStorage.getItem('usuarios'); 
-  
-    if (!usuariosString) {
+    var existeUSuario: boolean = this.userService.existeUsuario();
+    
+    //SI no existen usuarios en la memoria
+    if (!existeUSuario) {
       // Si no hay usuario almacenado en localStorage
       const alert = await this.alertController.create({
         header: 'Error',
@@ -85,33 +87,18 @@ export class LoginPage {
       await alert.present();
       return;
     }
-  
-    const usuarios = JSON.parse(usuariosString);
     
-    // Aquí puedes obtener el nombre del último usuario que inició sesión
-    // Si necesitas obtener un usuario específico, deberías pasar la lógica de identificación
-    // const usuarioAutenticado = usuarios.find((usuario: any) => usuario.ultimoUsuario === true);
+    //obtener formulario
+    const f = this.loginForm.value;
 
-    
-    // Validar que el usuario y la contraseña coincidan con algún usuario almacenado
-    const usuarioEncontrado = usuarios.find((usuario: any) => 
-      usuario.correo === f.correo && usuario.password === f.password
-    );
+    var validaUsuario: boolean=this.userService.validaUSuario(f.correo,f.password);
 
-    // Validar que el nombre de usuario y la contraseña coincidan
-    if (usuarioEncontrado) {
-      // Marcar este usuario como el que inició sesión
-        usuarios.forEach((u: any) => u.ultimoUsuario = false); // Resetear otros usuarios
-
-        usuarioEncontrado.ultimoUsuario = true; // Marcar este usuario
-
-        localStorage.setItem('usuarios', JSON.stringify(usuarios)); // Guardar cambios
-        
-        //ESTA ES LA VARIABLE O FORMA DE EMITIR EL VALOR TRUE AL COMPONENTE "PADRE"
-        this.datosAlPadre.emit(true);
-
-        this.router.navigate(['/inicio'], { queryParams: { nombre_usuario: usuarioEncontrado.nombre } });
-
+    // Validar que el usuario y contraseña coincidan con un usuario
+    if (validaUsuario) {
+      
+      this.router.navigate(['/inicio'], { queryParams: { nombre_usuario: f.correo } });
+      //ESTA ES LA VARIABLE O FORMA DE EMITIR EL VALOR TRUE AL COMPONENTE "PADRE"
+      this.datosAlPadre.emit(true);
     } else {
       // Si las credenciales no coinciden
       const alert = await this.alertController.create({
@@ -121,11 +108,7 @@ export class LoginPage {
       });
       await alert.present();
     }
-
-
-    
     
   }
-  
 
 }
