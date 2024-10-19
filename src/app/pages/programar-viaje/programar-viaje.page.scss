@@ -1,0 +1,28 @@
+#map{
+    margin-top: 10px;
+    width:80%;
+    height:40%;
+    display:block;
+    justify-self: center;
+}
+
+#trayecto{
+    width:80%;
+    height:40%;
+    display:block;
+    padding: 10px;
+    overflow-y: auto;
+    justify-self: center;
+}
+
+#autocomplete {
+    width: 100%;
+}
+
+#error{
+    color: red;
+}
+
+ion-item{
+    margin: 5px;
+}

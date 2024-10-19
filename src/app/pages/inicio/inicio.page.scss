@@ -1,6 +1,14 @@
 .div-bienvenida{
     display: flex;
-      justify-content: center;  // Centra horizontalmente
-      align-items: center;      // Centra verticalmente
-      height: 100%;   
+    justify-content: center;  // Centra horizontalmente
+    align-items: center;      // Centra verticalmente
+    height: 100%;
+    flex-direction: column;
+    
+}
+
+
+ion-button {
+  
+  margin: 10px 0; /* Ajusta el valor según necesites */
 }
