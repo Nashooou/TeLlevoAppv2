@@ -32,6 +32,7 @@
       <ion-item>
         
         <ion-select formControlName="asientosDisponibles" placeholder="1">
+          <ion-label>Selecciona los asientos disponibles</ion-label>
           <ion-select-option *ngFor="let i of [].constructor(4); let index = index" [value]="index + 1">{{ index + 1 }}</ion-select-option>
         </ion-select>
       </ion-item>
@@ -51,6 +52,8 @@
         <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio no puede ser negativo.</p>
       </div>
 
+      
+
       <ion-item>
         <input formControlName="destino" placeholder="Ingresa tu Destino" type="text" id="autocomplete">
       </ion-item>
@@ -59,14 +62,14 @@
       </div>
       
     </ion-card-content>
-
+    
   </form>
 
   
-
+  <div id="map"></div>
   <ion-button color="warning" shape="round" expand="block" (click)="calculaRuta()">Calcular Regreso</ion-button>
   <ion-button color="secondary" shape="round" [routerLink]="['/inicio']" expand="block">Volver</ion-button>
-  <div id="map"></div>
+  
   <div id="trayecto"></div>
 
 </ion-content>
