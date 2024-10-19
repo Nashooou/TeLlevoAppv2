@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -24,7 +24,8 @@ export class RegistroUsuarioPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastController: ToastController
   ) {
     this.registraForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+$')]],
@@ -117,6 +118,16 @@ export class RegistroUsuarioPage implements OnInit {
 
     // Guardar el arreglo actualizado en localStorage
     localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    
+    
+    // Mostrar un toast al registro exitoso
+    const toast = await this.toastController.create({
+      message: 'Alumno Registrado Correctamente',
+      duration: 2000,
+      color: 'success',
+      position: 'bottom'
+    });
+    await toast.present();
 
     this.router.navigate(['login']);
   }

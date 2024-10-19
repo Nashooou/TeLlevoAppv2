@@ -8,9 +8,14 @@ export const routes: Routes = [
   { path: 'recuperar-contrasena', loadComponent: () => import('./recuperar-contrasena/recuperar-contrasena.page').then( m => m.RecuperarContrasenaPage)},
   { path: 'perfil-usuario', loadComponent: () => import('./pages/perfil-usuario/perfil-usuario.page').then( m => m.PerfilUsuarioPage)},
   { path: 'editaperfil', loadComponent: () => import('./pages/crud/editaperfil/editaperfil.page').then( m => m.EditaperfilPage)},
-  { path: 'programar-viaje', loadComponent: () => import('./pages/programar-viaje/programar-viaje.page').then( m => m.ProgramarViajePage) },  {
+  { path: 'programar-viaje', loadComponent: () => import('./pages/programar-viaje/programar-viaje.page').then( m => m.ProgramarViajePage) },
+  {
     path: 'registravehiculo',
     loadComponent: () => import('./pages/crud/registravehiculo/registravehiculo.page').then( m => m.RegistravehiculoPage)
+  },
+  {
+    path: 'tabs',
+    loadComponent: () => import('./pages/tabs/tabs.page').then( m => m.TabsPage)
   },
 
 
