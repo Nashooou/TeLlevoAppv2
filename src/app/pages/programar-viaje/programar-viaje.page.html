@@ -12,11 +12,16 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  
+  <ion-card-header>
+    <ion-card-title>Programa tu regreso a casa</ion-card-title>
+  </ion-card-header>
+
+
+  <div id="map"></div>
+
+
   <form [formGroup]="programarForm" (ngSubmit)="onSubmit()">
-    <ion-card-header>
-      <ion-card-title>Programar viaje de regreso</ion-card-title>
-    </ion-card-header>
+    
 
     <ion-card-content>
       <ion-label position="floating">Hora de Salida</ion-label>
@@ -66,17 +71,17 @@
   </form>
 
   
-  <div id="map"></div>
+  
   <ion-button color="warning" shape="round" expand="block" (click)="calculaRuta()">Calcular Regreso</ion-button>
-  <ion-button color="secondary" shape="round" [routerLink]="['/inicio']" expand="block">Volver</ion-button>
+  <ion-button color="secondary" shape="round" [routerLink]="['/tabs/inicio']" expand="block">Volver</ion-button>
   
   <div id="trayecto"></div>
 
 </ion-content>
 
-
+<!-- 
 <ion-footer>
   <ion-toolbar color="primary">
     <ion-title>Duoc UC - 2024</ion-title>
   </ion-toolbar>
-</ion-footer>
+</ion-footer> -->

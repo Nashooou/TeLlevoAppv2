@@ -96,7 +96,7 @@ export class LoginPage {
     // Validar que el usuario y contraseña coincidan con un usuario
     if (validaUsuario) {
       
-      this.router.navigate(['/inicio'], { queryParams: { nombre_usuario: f.correo } });
+      this.router.navigate(['/tabs/inicio'], { queryParams: { nombre_usuario: f.correo } });
       //ESTA ES LA VARIABLE O FORMA DE EMITIR EL VALOR TRUE AL COMPONENTE "PADRE"
       this.datosAlPadre.emit(true);
     } else {
