@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
+import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
 
 @Component({
   selector: 'app-editaperfil',
@@ -27,7 +28,9 @@ export class EditaperfilPage  {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private usuarioService : UsuarioService,
+    private toastController : ToastController
   ) { 
     //Validación Formulario
     this.editaFormAlumno = this.fb.group({
@@ -49,25 +52,25 @@ export class EditaperfilPage  {
     });
   }
 
-  ngOnInit() {
-    // Obtener los datos de todos los usuarios desde localStorage
-    const usuariosData = localStorage.getItem('usuarios');
+  async ngOnInit() {
+
+    // Obtener usuarios desde el servicio
+    const usuarios = await this.usuarioService.obtenerUsuarios();
     
-    if (usuariosData) {
-      const usuarios = JSON.parse(usuariosData);
-      
-      // Buscar el usuario que ha iniciado sesión
-      const ultimoUsuarioAutenticado = usuarios.find((usuario: any) => usuario.ultimoUsuario === true);
-
-      if (ultimoUsuarioAutenticado) {
-        this.usuario = ultimoUsuarioAutenticado; // Asignar el usuario encontrado
-      }
-
+    // Aquí puedes obtener el nombre del último usuario que inició sesión
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+    
+    if (usuarioAutenticado) {
+      // Asignar el atributo a la variable que mostraremos
+      this.usuario = usuarioAutenticado;
+    }else{
+      console.log("No se pudo obtener el usuario autenticado")
     }
+    
   }
 
 
-  async guardarCambios(){
+  async guardarCambios() {
     if (this.editaFormAlumno.invalid) {
       // Si el formulario es inválido, mostrar un mensaje y no hacer nada
       const alert = await this.alertController.create({
@@ -78,12 +81,14 @@ export class EditaperfilPage  {
       await alert.present();
       return;
     }
-
+  
     const f = this.editaFormAlumno.value;
-    const usuariosString: any = localStorage.getItem('usuarios');
-
-    if (!usuariosString) {
-      // Si no hay usuario almacenado en localStorage
+  
+    // Obtener usuarios desde el servicio
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+  
+    if (usuarios.length === 0) {
+      // Si no hay usuario almacenado
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'No hay datos de usuario almacenados.',
@@ -92,11 +97,7 @@ export class EditaperfilPage  {
       await alert.present();
       return;
     }
-
-
-
-    const usuarios = JSON.parse(usuariosString); // Convertir a un array de objetos
-
+  
     // Validar si las nuevas contraseñas coinciden
     if (f.password !== f.password2) {
       const alert = await this.alertController.create({
@@ -107,29 +108,29 @@ export class EditaperfilPage  {
       await alert.present();
       return;
     }
-
+  
     // Validar la contraseña actual
     if (this.usuario.password === f.currentPassword) {
       // Actualizar la contraseña del usuario autenticado
-      const usuarioIndex = usuarios.findIndex((u: any) => u.correo === this.usuario.correo);
+      const usuarioIndex = usuarios.findIndex(u => u.correo === this.usuario.correo);
       
       if (usuarioIndex !== -1) {
         usuarios[usuarioIndex].password = f.password; // Actualizar la contraseña en el array de usuarios
+  
+        // Usar el servicio para guardar el usuario actualizado
+        await this.usuarioService.actualizarUsuario(usuarios[usuarioIndex]); // Actualiza el usuario en el servicio
       }
-
-      // Guardar el array actualizado de usuarios en localStorage
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-
-      const alert = await this.alertController.create({
-        header: 'Éxito',
-        message: 'Contraseña actualizada correctamente.',
-        buttons: ['Aceptar'],
+  
+      const toast = await this.toastController.create({
+        message: 'Contraseña actualizada Correctamente',
+        duration: 2000,
+        color: 'success',
+        position: 'bottom'
       });
-      await alert.present();
+      await toast.present();
       // Redirigir a página anterior (descomentar si tienes la ruta configurada)
-      this.router.navigate(['/perfil-usuario']);
-
-      
+      this.router.navigate(['/tabs/perfil-usuario']);
+  
     } else {
       const alert = await this.alertController.create({
         header: 'Error',

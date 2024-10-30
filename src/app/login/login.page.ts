@@ -30,6 +30,7 @@ export class LoginPage {
   @ViewChild('text', {read:ElementRef}) text?:ElementRef<HTMLImageElement>;
   
   // OUTPUT PERMITE COMPARTIR DATOS DESDE UN COMPONENTE HIJO A UN PADRE POR MEDIO DE EMISIÓN DE EVENTOS
+  // OUTPUT decorador que se usa para emitir eventos desde un componente hijo hacia su componente padre.
   @Output() datosAlPadre = new EventEmitter<boolean>();
 
   constructor(
@@ -77,8 +78,10 @@ export class LoginPage {
     // Obtener el formulario
     const f = this.loginForm.value;
 
+    const correoMinuscula = this.todoMinuscula(f.correo);
+
     // Verificar si el usuario existe por correo
-    const existeUsuario = await this.usuarioService.existeUsuario('', f.correo); // Solo verificamos el correo
+    const existeUsuario = await this.usuarioService.existeUsuario('', correoMinuscula); // Solo verificamos el correo
 
     if (!existeUsuario) {
       // Si no hay usuario almacenado en localStorage
@@ -92,12 +95,35 @@ export class LoginPage {
     }
     
     // Validar que el usuario y contraseña coincidan con un usuario
-    const validaUsuario = await this.usuarioService.validaUSuario(f.correo, f.password);
+    const validaUsuario = await this.usuarioService.validaUSuario(correoMinuscula, f.password);
 
     if (validaUsuario) {
-      this.router.navigate(['/tabs/inicio'], { queryParams: { nombre_usuario: f.correo } });
-      // Esta es la variable o forma de emitir el valor true al componente "padre"
+      
+      // Obtener la lista de usuarios
+      const usuarios = await this.usuarioService.obtenerUsuarios();
+      const usuario = usuarios.find(u => u.correo === correoMinuscula);
+
+      if (usuario) {
+        // Establecer autenticado a true y el resto a false
+        usuario.autenticado = true;
+  
+        // Asegúrate de que los demás usuarios tengan autenticado en false
+        usuarios.forEach(u => {
+          if (u.correo !== correoMinuscula) {
+            u.autenticado = false;
+          }
+        });
+  
+        // Guardar el usuario actualizado
+        await this.usuarioService.actualizarUsuario(usuario); // Actualiza el usuario específico
+      }
+      
+      // Navegar a la página de inicio
+      this.router.navigate(['/tabs/inicio']);
+      
+      // Emitir el valor true al componente padre
       this.datosAlPadre.emit(true);
+
     } else {
       // Si las credenciales no coinciden
       const alert = await this.alertController.create({
@@ -108,6 +134,11 @@ export class LoginPage {
       await alert.present();
     }
     
+  }
+
+
+  private todoMinuscula(string:string): string{
+    return string.toLowerCase();
   }
 
 }

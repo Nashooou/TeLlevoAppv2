@@ -79,14 +79,17 @@ export class RegistroUsuarioPage implements OnInit {
   
     const nombreCapitalizado = this.primeraLetraMayuscula(f.nombre);
     const apellidoCapitalizado = this.primeraLetraMayuscula(f.apellido);
-    
+    const usuarioMinuscula = this.todoMinuscula(f.username);
+    const correoMinuscula = this.todoMinuscula(f.correo);
+
     //Crear objeto usuario
     const usuario: Usuario = {
       nombre: nombreCapitalizado,
       apellido: apellidoCapitalizado,
-      username: f.username,
-      correo: f.correo,
-      password: f.password
+      username: usuarioMinuscula,
+      correo: correoMinuscula,
+      password: f.password,
+      autenticado: false,
     };
 
     // Verificar si el usuario existe
@@ -126,7 +129,9 @@ export class RegistroUsuarioPage implements OnInit {
   }
 
 
-
+  private todoMinuscula(string:string): string{
+    return string.toLowerCase();
+  }
 
   private primeraLetraMayuscula(string: string): string {
     if (!string) return '';

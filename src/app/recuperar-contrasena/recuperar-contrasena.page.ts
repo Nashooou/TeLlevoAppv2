@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
+import { UsuarioService } from '../services/UsuarioService/usuario.service';
 
 @Component({
   selector: 'app-recuperar-contrasena',
@@ -15,7 +16,14 @@ import { Router, RouterLink } from '@angular/router';
 export class RecuperarContrasenaPage {
   recuperaForm!: FormGroup;
 
-  constructor(private fb:FormBuilder, private router:Router, private alertController:AlertController) { 
+  constructor(
+    private fb:FormBuilder, 
+    private router:Router, 
+    private alertController:AlertController,
+    private usuarioService:UsuarioService,
+    private toastController: ToastController,
+  ) { 
+
     //SETEAR VALIDACION DE FORMULARIO
     this.recuperaForm = this.fb.group({
       correo: ['', [
@@ -40,7 +48,7 @@ export class RecuperarContrasenaPage {
   //MÉTODO PARA RECUPERAR O CONTRASEÑA
   async recuperar() {
     const f = this.recuperaForm.value;
-    const usuariosString: any = localStorage.getItem('usuarios');
+    
 
     //SI EL CORREO ELECTRÓNICO ESTÁ VACIO
     if (this.recuperaForm.get('correo')?.invalid ) {
@@ -53,21 +61,25 @@ export class RecuperarContrasenaPage {
       return;
     }
 
-    //SI NO EXISTEN USUARIOS
-    if (!usuariosString) {
+    // Verificar si el usuario existe por correo
+    const existeUsuario = await this.usuarioService.existeUsuario('', f.correo); // Solo verificamos el correo
+
+    if (!existeUsuario) {
+      // Si no hay usuario almacenado en localStorage
       const alert = await this.alertController.create({
         header: 'Error',
-        message: 'No hay usuarios almacenados.',
+        message: 'Este correo no está registrado.',
         buttons: ['Aceptar'],
       });
       await alert.present();
       return;
     }
 
-    const usuarios = JSON.parse(usuariosString);
-    const usuario = usuarios.find((u: any) => u.correo === f.correo);
 
-    // Si el correo no existe
+    // Obtener el usuario correspondiente
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+    const usuario = usuarios.find((u) => u.correo === f.correo);
+
     if (!usuario) {
       const alert = await this.alertController.create({
         header: 'Error',
@@ -76,44 +88,45 @@ export class RecuperarContrasenaPage {
       });
       await alert.present();
       return;
-    
-    }else{
-      
-      //SI EL CORREO EXISTE COMPARA LAS CONTRASEÑAS
-
-      if (f.nuevaContrasena !== f.nuevaContrasena2){
-        const alert = await this.alertController.create({
-          header: 'Error',
-          message: 'Las contraseñas no coinciden',
-          buttons: ['Aceptar'],
-        });
-        await alert.present();
-        return;
-        
-      } else {
-
-        //SI LAS CONTRASEÑAS COINCIDEN ACTUALIZA LA CONTRASEÑA DEL USUARIO
-        usuario.password = f.nuevaContrasena;
-
-        // Guardar el arreglo actualizado en localStorage
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
-
-        
-        const alert = await this.alertController.create({
-          header: 'Éxito',
-          message: 'Contraseña actualizada correctamente.',
-          buttons: ['Aceptar'],
-        });
-        await alert.present();
-
-        // Redirigir al login
-        this.router.navigate(['/login']);
-        }
-
     }
+
     
-    
+      // Comparar las contraseñas
+    if (f.nuevaContrasena !== f.nuevaContrasena2) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Las contraseñas no coinciden',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+
+    // Actualizar la contraseña del usuario
+    usuario.password = f.nuevaContrasena;
+
+    // Llamar al método para actualizar el usuario
+    const actualizado = await this.usuarioService.actualizarUsuario(usuario);
+    if (actualizado) {
+      const toast = await this.toastController.create({
+        message: 'Contraseña Actualizada Correctamente',
+        duration: 2000,
+        color: 'success',
+        position: 'bottom'
+      });
+      await toast.present();
+
+      // Redirigir al login
+      this.router.navigate(['/login']);
+
+    } else {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se pudo actualizar la contraseña.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+    }
   }
-
-
 }

@@ -7,6 +7,7 @@ export interface Usuario {
   username: string;
   correo: string;
   password: string;
+  autenticado:boolean;
 }
 
 @Injectable({
@@ -14,7 +15,9 @@ export interface Usuario {
 })
 export class UsuarioService {
 
-  constructor(private storage: Storage) { 
+  constructor(
+    private storage: Storage
+  ) { 
     this.init();
   }
 
@@ -42,6 +45,26 @@ export class UsuarioService {
     return true; // O puedes retornar el nuevo usuario, etc.
   }
 
+
+
+  async guardarListaUsuarios(usuarios: Usuario[]) {
+    await this.storage.set('usuarios', usuarios);
+  }
+
+
+
+  
+  async actualizarUsuario(usuario: Usuario) {
+    const usuarios = await this.obtenerUsuarios();
+    const index = usuarios.findIndex(u => u.correo === usuario.correo);
+    
+    if (index !== -1) {
+      usuarios[index] = usuario; // Actualiza el usuario existente
+      await this.storage.set('usuarios', usuarios);
+      return true;
+    }
+    return false; // Si el usuario no se encontró
+  }
 
 
 

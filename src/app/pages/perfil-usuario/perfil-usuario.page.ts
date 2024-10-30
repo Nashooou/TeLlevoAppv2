@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { add, car, create, createOutline, personCircle } from 'ionicons/icons';
+import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
 
 @Component({
   selector: 'app-perfil-usuario',
@@ -20,11 +21,10 @@ import { add, car, create, createOutline, personCircle } from 'ionicons/icons';
   ]
 })
 export class PerfilUsuarioPage implements OnInit {
-  usuario: any = {}; // Declara la variable usuario
-  
-
+  usuario: any = {};
   constructor(
-    private router: Router
+    private router: Router,
+    private usuarioService: UsuarioService
   ) {
     
     addIcons({
@@ -35,20 +35,16 @@ export class PerfilUsuarioPage implements OnInit {
     });
   }
 
-  ngOnInit() {
-    // Obtener los datos de todos los usuarios desde localStorage
-    const usuariosData = localStorage.getItem('usuarios');
+  async ngOnInit() {
+    // Obtener usuarios desde el servicio
+    const usuarios = await this.usuarioService.obtenerUsuarios();
     
-    if (usuariosData) {
-      const usuarios = JSON.parse(usuariosData);
-      
-      // Buscar el usuario que ha iniciado sesión
-      const ultimoUsuarioAutenticado = usuarios.find((usuario: any) => usuario.ultimoUsuario === true);
-
-      if (ultimoUsuarioAutenticado) {
-        this.usuario = ultimoUsuarioAutenticado; // Asignar el usuario encontrado
-      }
-
+    // Aquí puedes obtener el nombre del último usuario que inició sesión
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+    
+    if (usuarioAutenticado) {
+      // Asignar el atributo a la variable que mostraremos
+      this.usuario = usuarioAutenticado;
     }
   }
 }
