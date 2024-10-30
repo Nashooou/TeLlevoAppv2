@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../services/userService/user-service.service';
+import { UsuarioService } from '../services/UsuarioService/usuario.service';
 
 
 
@@ -36,7 +36,7 @@ export class LoginPage {
     private fb:FormBuilder, 
     private router:Router, 
     private alertController:AlertController,
-    private userService:UserService
+    private usuarioService: UsuarioService
   ) { 
     this.loginForm = this.fb.group({
 
@@ -73,31 +73,30 @@ export class LoginPage {
       await alert.present();
       return;
     }
-  
-    var existeUSuario: boolean = this.userService.existeUsuario();
     
-    //SI no existen usuarios en la memoria
-    if (!existeUSuario) {
+    // Obtener el formulario
+    const f = this.loginForm.value;
+
+    // Verificar si el usuario existe por correo
+    const existeUsuario = await this.usuarioService.existeUsuario('', f.correo); // Solo verificamos el correo
+
+    if (!existeUsuario) {
       // Si no hay usuario almacenado en localStorage
       const alert = await this.alertController.create({
         header: 'Error',
-        message: 'No hay datos de usuario almacenados.',
+        message: 'No existe el usuario.',
         buttons: ['Aceptar'],
       });
       await alert.present();
       return;
     }
     
-    //obtener formulario
-    const f = this.loginForm.value;
-
-    var validaUsuario: boolean=this.userService.validaUSuario(f.correo,f.password);
-
     // Validar que el usuario y contraseña coincidan con un usuario
+    const validaUsuario = await this.usuarioService.validaUSuario(f.correo, f.password);
+
     if (validaUsuario) {
-      
       this.router.navigate(['/tabs/inicio'], { queryParams: { nombre_usuario: f.correo } });
-      //ESTA ES LA VARIABLE O FORMA DE EMITIR EL VALOR TRUE AL COMPONENTE "PADRE"
+      // Esta es la variable o forma de emitir el valor true al componente "padre"
       this.datosAlPadre.emit(true);
     } else {
       // Si las credenciales no coinciden

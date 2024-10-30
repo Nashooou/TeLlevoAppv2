@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
+import { UsuarioService, Usuario } from '../services/UsuarioService/usuario.service';
+
+
 
 @Component({
   selector: 'app-registro-usuario',
@@ -25,7 +28,8 @@ export class RegistroUsuarioPage implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private alertController: AlertController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private usuarioService: UsuarioService
   ) {
     this.registraForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+$')]],
@@ -75,62 +79,54 @@ export class RegistroUsuarioPage implements OnInit {
   
     const nombreCapitalizado = this.primeraLetraMayuscula(f.nombre);
     const apellidoCapitalizado = this.primeraLetraMayuscula(f.apellido);
-  
-    const usuario = {
+    
+    //Crear objeto usuario
+    const usuario: Usuario = {
       nombre: nombreCapitalizado,
       apellido: apellidoCapitalizado,
       username: f.username,
       correo: f.correo,
       password: f.password
     };
-  
-    // localStorage.setItem('usuario', JSON.stringify(usuario));
 
-    // Obtener usuarios existentes o crear un nuevo arreglo
-    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    
-    //Verificar si el usuario existe
-    const usuarioExistente = usuarios.find((u: any) => u.username === usuario.username);
-    const correoExistente = usuarios.find((u: any) => u.correo === usuario.correo);
-
-    if (usuarioExistente) {
-      const alert = await this.alertController.create({
-        header: 'Usuario existente',
-        message: 'El nombre de usuario ya está en uso.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
-    
-    if (correoExistente) {
+    // Verificar si el usuario existe
+    const existe = await this.usuarioService.existeUsuario(usuario.username, usuario.correo);
+    if (existe) {
       const alert = await this.alertController.create({
         header: 'Error',
-        message: 'Este correo electrónico ya está en uso.',
+        message: 'El nombre de usuario o correo ya está en uso.',
         buttons: ['Aceptar'],
       });
       await alert.present();
       return;
     }
 
-    // Agregar el nuevo usuario al arreglo
-    usuarios.push(usuario);
 
-    // Guardar el arreglo actualizado en localStorage
-    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    try {
+      await this.usuarioService.guardarUsuario(usuario);
+      const toast = await this.toastController.create({
+        message: 'Alumno Registrado Correctamente',
+        duration: 2000,
+        color: 'success',
+        position: 'bottom'
+      });
+      await toast.present();
     
-    
-    // Mostrar un toast al registro exitoso
-    const toast = await this.toastController.create({
-      message: 'Alumno Registrado Correctamente',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
-
-    this.router.navigate(['login']);
+      this.router.navigate(['login']);
+    } catch (error) {
+      
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Usuario no pudo ser registrado, avise al administrador', // Mostrar el mensaje del error
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+    }
+  
   }
+
+
+
 
   private primeraLetraMayuscula(string: string): string {
     if (!string) return '';
