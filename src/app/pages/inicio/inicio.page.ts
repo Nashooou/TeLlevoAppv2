@@ -18,7 +18,7 @@ import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service'
 export class InicioPage implements OnInit {
 
   // Variables
-  par_username: string = "Login";
+  par_nombre: string = "Login";
 
   constructor(
     private router: Router,
@@ -41,7 +41,13 @@ export class InicioPage implements OnInit {
     
     if (usuarioAutenticado) {
       // Asignar el atributo a la variable que mostraremos
-      this.par_username = usuarioAutenticado.nombre;
+      this.par_nombre = usuarioAutenticado.nombre;
     }
   }
+
+  irBuscarViaje(){
+    this.router.navigate(['/tabs/buscarviaje']);
+  }
+
+
 }

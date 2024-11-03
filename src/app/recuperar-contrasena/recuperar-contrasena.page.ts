@@ -62,7 +62,7 @@ export class RecuperarContrasenaPage {
     }
 
     // Verificar si el usuario existe por correo
-    const existeUsuario = await this.usuarioService.existeUsuario('', f.correo); // Solo verificamos el correo
+    const existeUsuario = await this.usuarioService.existeUsuario(f.correo); // Solo verificamos el correo
 
     if (!existeUsuario) {
       // Si no hay usuario almacenado en localStorage

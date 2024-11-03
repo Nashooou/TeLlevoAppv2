@@ -54,9 +54,16 @@
             </div>
 
             <ion-item>
-              <ion-label>Capacidad Asientos:</ion-label>
-              
-              <ion-input 
+              <ion-label >Capacidad Asientos:</ion-label>
+              <ion-select style="text-align: right;" formControlName="newAsientos" interface="popover" placeholder="{{ vehiculo?.asientos }}">
+                <ion-label>Selecciona la cantidad de asientos:</ion-label>
+                <ion-select-option value="2">2</ion-select-option>
+                <ion-select-option value="3">3</ion-select-option>
+                <ion-select-option value="4">4</ion-select-option>
+                <ion-select-option value="5">5</ion-select-option>
+                
+              </ion-select>
+              <!-- <ion-input 
                 formControlName="newAsientos"  
                 label-placement="floating" 
                 fill="undefined" 
@@ -65,7 +72,7 @@
                 style="text-align: right;"
                 min="2"
                 max="5">
-              </ion-input>  
+              </ion-input>   -->
             </ion-item>
             
             <div *ngIf="editaFormVehiculo.get('newAsientos')?.invalid && editaFormVehiculo.get('newAsientos')?.touched">

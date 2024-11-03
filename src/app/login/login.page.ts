@@ -81,7 +81,7 @@ export class LoginPage {
     const correoMinuscula = this.todoMinuscula(f.correo);
 
     // Verificar si el usuario existe por correo
-    const existeUsuario = await this.usuarioService.existeUsuario('', correoMinuscula); // Solo verificamos el correo
+    const existeUsuario = await this.usuarioService.existeUsuario(correoMinuscula); // Solo verificamos el correo
 
     if (!existeUsuario) {
       // Si no hay usuario almacenado en localStorage
