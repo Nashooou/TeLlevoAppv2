@@ -90,6 +90,7 @@ export class RegistroUsuarioPage implements OnInit {
       correo: correoMinuscula,
       password: f.password,
       autenticado: false,
+      tieneAuto:false
     };
 
     // Verificar si el usuario existe

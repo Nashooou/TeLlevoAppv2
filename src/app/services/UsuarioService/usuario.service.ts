@@ -8,6 +8,7 @@ export interface Usuario {
   correo: string;
   password: string;
   autenticado:boolean;
+  tieneAuto:boolean;
 }
 
 @Injectable({

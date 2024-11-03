@@ -15,8 +15,11 @@ export const routes: Routes = [
       { path: 'editaperfil', loadComponent: () => import('./pages/crud/editaperfil/editaperfil.page').then(m => m.EditaperfilPage) },
       { path: 'programar-viaje', loadComponent: () => import('./pages/programar-viaje/programar-viaje.page').then(m => m.ProgramarViajePage) },
       { path: 'registravehiculo', loadComponent: () => import('./pages/crud/registravehiculo/registravehiculo.page').then(m => m.RegistravehiculoPage) },
+      { path: 'editavehiculo', loadComponent: () => import('./pages/crud/editavehiculo/editavehiculo/editavehiculo.page').then( m => m.EditavehiculoPage) },
       { path: '', redirectTo: 'inicio', pathMatch: 'full' } // Redirige a la página "inicio" por defecto
     ]
   },
+  
+
 
 ];
