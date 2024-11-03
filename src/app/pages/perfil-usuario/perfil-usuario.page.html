@@ -58,14 +58,15 @@
     
 
   <ion-card>
-    <ion-grid>
+    <ion-grid *ngIf="showAgregaVehiculo">
 
       <ion-card-header>
         <ion-item>
-          <ion-card-title>Registro de Vehículo</ion-card-title>
+          <ion-card-title>Vehículo</ion-card-title>
           <ion-icon name="car" slot="end" color="primary" size="large"></ion-icon>
         </ion-item>
       </ion-card-header>
+
 
       <ion-card-content>
         <ion-row>
@@ -73,16 +74,59 @@
             <div class="infoapp">
               <ion-list>
                 <ion-item>
+                  <ion-label>Usted no posee vehiculo</ion-label>
+                </ion-item>
+                
+              </ion-list>
+            </div>    
+          </ion-col>
+        </ion-row>
+        
+      </ion-card-content>
+      
+      <ion-fab horizontal="end" vertical="bottom">
+        <ion-fab-button color="warning">
+          <ion-icon name="add" size="large" [routerLink]="['/tabs/registravehiculo']"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-grid>
+    
+    
+    <ion-grid *ngIf="!showAgregaVehiculo">
+      <ion-card-header>
+        <ion-item>
+          <ion-card-title>Vehículo</ion-card-title>
+          <ion-icon name="car" slot="end" color="primary" size="large"></ion-icon>
+        </ion-item>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-row>
+          <ion-col>
+            <div class="infoapp">
+              <ion-list>
+                <ion-item>
                   <ion-label>Marca:</ion-label>
-                  <ion-text>Kia</ion-text>
+                  <ion-text>{{ vehiculo?.marca }}</ion-text>
                 </ion-item>
                 <ion-item>
                   <ion-label>Modelo:</ion-label>
-                  <ion-text>0</ion-text>
+                  <ion-text>{{ vehiculo?.modelo }}</ion-text>
                 </ion-item>
                 <ion-item>
                   <ion-label>Año:</ion-label>
-                  <ion-text>2020</ion-text>
+                  <ion-text>{{ vehiculo?.anio }}</ion-text>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Patente:</ion-label>
+                  <ion-text>{{ vehiculo?.patente }}</ion-text>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Color:</ion-label>
+                  <ion-text>{{ vehiculo?.color }}</ion-text>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Asientos:</ion-label>
+                  <ion-text>{{ vehiculo?.asientos }}</ion-text>
                 </ion-item>
               </ion-list>
             </div>    
@@ -90,15 +134,17 @@
         </ion-row>
         
       </ion-card-content>
-
+      
       <ion-fab horizontal="end" vertical="bottom">
         <ion-fab-button color="warning">
-          <ion-icon name="add" size="large"></ion-icon>
+          <ion-icon name="editar" size="large" (click)="irEditarVehiculo()"></ion-icon>
         </ion-fab-button>
       </ion-fab>
     </ion-grid>
     
   </ion-card>
+
+
 </ion-content>
 <!-- 
 <ion-footer>

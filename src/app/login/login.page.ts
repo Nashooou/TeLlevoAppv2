@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../services/userService/user-service.service';
+import { UsuarioService } from '../services/UsuarioService/usuario.service';
 
 
 
@@ -30,13 +30,14 @@ export class LoginPage {
   @ViewChild('text', {read:ElementRef}) text?:ElementRef<HTMLImageElement>;
   
   // OUTPUT PERMITE COMPARTIR DATOS DESDE UN COMPONENTE HIJO A UN PADRE POR MEDIO DE EMISIÓN DE EVENTOS
+  // OUTPUT decorador que se usa para emitir eventos desde un componente hijo hacia su componente padre.
   @Output() datosAlPadre = new EventEmitter<boolean>();
 
   constructor(
     private fb:FormBuilder, 
     private router:Router, 
     private alertController:AlertController,
-    private userService:UserService
+    private usuarioService: UsuarioService
   ) { 
     this.loginForm = this.fb.group({
 
@@ -73,32 +74,56 @@ export class LoginPage {
       await alert.present();
       return;
     }
-  
-    var existeUSuario: boolean = this.userService.existeUsuario();
     
-    //SI no existen usuarios en la memoria
-    if (!existeUSuario) {
+    // Obtener el formulario
+    const f = this.loginForm.value;
+
+    const correoMinuscula = this.todoMinuscula(f.correo);
+
+    // Verificar si el usuario existe por correo
+    const existeUsuario = await this.usuarioService.existeUsuario('', correoMinuscula); // Solo verificamos el correo
+
+    if (!existeUsuario) {
       // Si no hay usuario almacenado en localStorage
       const alert = await this.alertController.create({
         header: 'Error',
-        message: 'No hay datos de usuario almacenados.',
+        message: 'No existe el usuario.',
         buttons: ['Aceptar'],
       });
       await alert.present();
       return;
     }
     
-    //obtener formulario
-    const f = this.loginForm.value;
-
-    var validaUsuario: boolean=this.userService.validaUSuario(f.correo,f.password);
-
     // Validar que el usuario y contraseña coincidan con un usuario
+    const validaUsuario = await this.usuarioService.validaUSuario(correoMinuscula, f.password);
+
     if (validaUsuario) {
       
-      this.router.navigate(['/tabs/inicio'], { queryParams: { nombre_usuario: f.correo } });
-      //ESTA ES LA VARIABLE O FORMA DE EMITIR EL VALOR TRUE AL COMPONENTE "PADRE"
+      // Obtener la lista de usuarios
+      const usuarios = await this.usuarioService.obtenerUsuarios();
+      const usuario = usuarios.find(u => u.correo === correoMinuscula);
+
+      if (usuario) {
+        // Establecer autenticado a true y el resto a false
+        usuario.autenticado = true;
+  
+        // Asegúrate de que los demás usuarios tengan autenticado en false
+        usuarios.forEach(u => {
+          if (u.correo !== correoMinuscula) {
+            u.autenticado = false;
+          }
+        });
+  
+        // Guardar el usuario actualizado
+        await this.usuarioService.actualizarUsuario(usuario); // Actualiza el usuario específico
+      }
+      
+      // Navegar a la página de inicio
+      this.router.navigate(['/tabs/inicio']);
+      
+      // Emitir el valor true al componente padre
       this.datosAlPadre.emit(true);
+
     } else {
       // Si las credenciales no coinciden
       const alert = await this.alertController.create({
@@ -109,6 +134,11 @@ export class LoginPage {
       await alert.present();
     }
     
+  }
+
+
+  private todoMinuscula(string:string): string{
+    return string.toLowerCase();
   }
 
 }

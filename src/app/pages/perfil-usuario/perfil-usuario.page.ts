@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, NavigationExtras, Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { add, car, create, createOutline, personCircle } from 'ionicons/icons';
+import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
+import { VehiculoService } from 'src/app/services/VehiculoService/vehiculo.service';
 
 @Component({
   selector: 'app-perfil-usuario',
@@ -20,11 +22,14 @@ import { add, car, create, createOutline, personCircle } from 'ionicons/icons';
   ]
 })
 export class PerfilUsuarioPage implements OnInit {
-  usuario: any = {}; // Declara la variable usuario
-  
+  usuario: any = {};
+  vehiculo:any = {};
+  showAgregaVehiculo:boolean=true;
 
   constructor(
-    private router: Router
+    private router: Router,
+    private usuarioService: UsuarioService,
+    private vehiculoService: VehiculoService
   ) {
     
     addIcons({
@@ -33,22 +38,56 @@ export class PerfilUsuarioPage implements OnInit {
       'car' : car,
       'add' :add
     });
+
+    // Escuchar cuando se navega de nuevo a este componente
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd && this.router.url === '/tabs/perfil-usuario') {
+        this.cargarDatos(); // Recargar los datos del usuario y el vehículo al navegar de nuevo a la página
+      }
+    });
   }
 
-  ngOnInit() {
-    // Obtener los datos de todos los usuarios desde localStorage
-    const usuariosData = localStorage.getItem('usuarios');
+  async ngOnInit() {
     
-    if (usuariosData) {
-      const usuarios = JSON.parse(usuariosData);
-      
-      // Buscar el usuario que ha iniciado sesión
-      const ultimoUsuarioAutenticado = usuarios.find((usuario: any) => usuario.ultimoUsuario === true);
+    this.cargarDatos();
+    
+  }
 
-      if (ultimoUsuarioAutenticado) {
-        this.usuario = ultimoUsuarioAutenticado; // Asignar el usuario encontrado
+  async cargarDatos() {
+    // Obtener usuarios desde el servicio
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+    
+
+    const vehiculos = await this.vehiculoService.obtenerVehiculos();
+    const vehiculoObj = vehiculos.find((vehiculo: any) => vehiculo.userPropietario === usuarioAutenticado?.username);
+
+    if (usuarioAutenticado) {
+
+      // Asignar el atributo a la variable que mostraremos
+      this.usuario = usuarioAutenticado;
+
+      if(usuarioAutenticado.tieneAuto){
+        this.showAgregaVehiculo = false;
+      }else{
+        this.showAgregaVehiculo = true;
       }
 
     }
+
+    if(vehiculoObj){
+      this.vehiculo = vehiculoObj;
+    }
+
   }
+
+  irEditarVehiculo(){
+    let navigationExtras:NavigationExtras={
+      state:{
+        patente: this.vehiculo.patente
+      }
+    }
+    this.router.navigate(['/tabs/editavehiculo'],navigationExtras );
+  }
+
 }

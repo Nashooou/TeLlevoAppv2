@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { home } from 'ionicons/icons';
+import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
 
 @Component({
   selector: 'app-inicio',
@@ -19,32 +20,28 @@ export class InicioPage implements OnInit {
   // Variables
   par_username: string = "Login";
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private usuarioService: UsuarioService
+  ) {
     
 
     addIcons({
       'home':home
     });
+
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Obtener usuarios desde el servicio
+    const usuarios = await this.usuarioService.obtenerUsuarios();
     
+    // Aquí puedes obtener el nombre del último usuario que inició sesión
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
     
-    // Obtener objeto de localStorage
-    const usuariosObj = localStorage.getItem('usuarios'); // Cambiado a "usuarios"
-
-    if (usuariosObj) {
-      // Parsear de JSON a string
-      const usuarios = JSON.parse(usuariosObj);
-      
-      // Aquí puedes obtener el nombre del último usuario que inició sesión
-      // Si necesitas obtener un usuario específico, deberías pasar la lógica de identificación
-      const usuarioAutenticado = usuarios.find((usuario: any) => usuario.ultimoUsuario === true);
-      
-      if (usuarioAutenticado) {
-        // Asignar el atributo a la variable que mostraremos
-        this.par_username = usuarioAutenticado.nombre;
-      }
+    if (usuarioAutenticado) {
+      // Asignar el atributo a la variable que mostraremos
+      this.par_username = usuarioAutenticado.nombre;
     }
   }
 }

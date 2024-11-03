@@ -1,13 +1,132 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>registravehiculo</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Vehículo</ion-title>
+  </ion-toolbar>
+  <ion-toolbar >
+    <div class="logo-container"   >
+      <img #logo  src="assets/icon/logoduocuc.png" alt="logotipo de la Empresa" class="logo" />
+    </div>
+    
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">registravehiculo</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <form [formGroup]="registraVehiculoForm" (ngSubmit)="registrarVehiculo()">
+    
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Registro de nuevo Vehículo</ion-card-title>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <div>
+
+
+          <ion-item>
+            <ion-input 
+              formControlName="marca" 
+              label="Marca" 
+              label-placement="floating" 
+              placeholder="Marca"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraVehiculoForm.get('marca')?.invalid && registraVehiculoForm.get('marca')?.touched">
+            Ingresa una Marca de vehículo
+          </div>
+
+
+
+
+          <ion-item>
+            <ion-input 
+              formControlName="modelo" 
+              label="Modelo" 
+              label-placement="floating" 
+              placeholder="Modelo"></ion-input>
+          </ion-item>
+
+          <div *ngIf="registraVehiculoForm.get('modelo')?.invalid && registraVehiculoForm.get('modelo')?.touched">
+            Ingresa un modelo válido.
+          </div>
+
+
+
+
+          <ion-item>
+            <ion-input 
+              formControlName="patente" 
+              label="Patente" 
+              label-placement="floating" 
+              placeholder="Patente"
+              (ionInput)="convertirAMayusculas($event)"
+              maxlength="6"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraVehiculoForm.get('patente')?.invalid && registraVehiculoForm.get('patente')?.touched">
+            Debes ingresar una Patente válida (Formato: AA1234 o AABB12)
+          </div>
+
+
+
+          <ion-item>
+            <ion-input 
+              type="number"
+              formControlName="anio" 
+              label="Año" 
+              label-placement="floating" 
+              fill="undefined" 
+              placeholder="Año"
+              min="1980"
+              max="2024">
+            </ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraVehiculoForm.get('anio')?.invalid && registraVehiculoForm.get('anio')?.touched">
+            Debes seleccionar el Año del vehículo
+          </div>
+
+
+
+          <ion-item>
+            <ion-input formControlName="color" label="Color" label-placement="floating" fill="undefined" placeholder="Color"></ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraVehiculoForm.get('color')?.invalid && registraVehiculoForm.get('color')?.touched">
+            Debes ingresar el color del vehículo
+          </div>
+
+
+
+          
+          <ion-item>
+            <ion-input 
+              type="number"
+              formControlName="asientos" 
+              label="Total Asientos" 
+              label-placement="floating" 
+              fill="undefined" 
+              placeholder="Total Asientos"
+              min="2"
+              max="5"
+              maxlength="1">
+            </ion-input>
+          </ion-item>
+          
+          <div *ngIf="registraVehiculoForm.get('asientos')?.invalid && registraVehiculoForm.get('asientos')?.touched">
+            Debes ingresar la cantidad total de asientos.
+          </div>
+
+        </div>
+
+        <div id="error" *ngIf="(registraVehiculoForm.invalid)">
+          <p>
+            Recuerda ingresar todos los datos solicitados
+          </p>
+        </div>
+        
+        <ion-button id="open-toast" color="warning" shape="round" expand="block" type="submit">Agregar vehículo</ion-button>
+        <ion-button color="secondary" shape="round" [routerLink]="['/tabs/perfil-usuario']" expand="block">Volver</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </form>
 </ion-content>

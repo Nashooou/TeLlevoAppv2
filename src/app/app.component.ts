@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { home, personCircleSharp, logOut, gridSharp } from 'ionicons/icons';
 
 import { LoginPage } from './login/login.page';
+import { UsuarioService } from './services/UsuarioService/usuario.service';
 
 @Component({
   selector: 'app-root',
@@ -36,7 +37,10 @@ export class AppComponent {
   showMenu: boolean = false;
   
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private usuarioService:UsuarioService
+  ) {
     // this.showMenu = false;
     // Registro de íconos
     
@@ -53,11 +57,13 @@ export class AppComponent {
 
   //SE EJECUTA LUEGO DE QUE LA VISTA SE INICIA
   ngAfterViewInit() {
-    //CREA UNA SUBSCRIPCIÓN PARA "MIRAR VARIABLE" PARA CUANDO EMITE UN VALOR O CAMBIA DE ESTADO
+    //CREA UNA SUBSCRIPCIÓN AL EVENTO PARA "MIRAR VARIABLE" CUANDO CAMBIA DE ESTADO
     this.outlet.activateEvents.subscribe((component) => {
-      //CUANDO EL LOGIN ES EXITOSO EMITE UN NUEVO VALOR O CAMBIA EL ESTADO DE UNA VARIABLE
-      //SI EL COMPONENTE QUE EMITIÓ EL VALOR ES EL LOGINPAGE NOS VOLVEMOS A SUSCRIBIR A LA VARIABLE "DATOS DEL PADRE" QUE EMITE UN VALOR BOOL
+      //si ese componente es LoginPage, te suscribes al evento datosAlPadre
       if (component instanceof LoginPage) {
+        //Cuando el evento es emitido, se ejecuta la función de callback y puedes manejar 
+        //el valor recibido (true en este caso) para actualizar el estado
+        // en el componente padre (por ejemplo, mostrando u ocultando un menú).
         component.datosAlPadre.subscribe((valor) => { this.showMenu = valor;});
       }
     });
@@ -66,10 +72,18 @@ export class AppComponent {
 
 
 
-  clickOpcionMenu(link: string) {
+  async clickOpcionMenu(link: string) {
     if (link == "/login") {
       this.showMenu = false;
-      // localStorage.removeItem("usuarios");
+      
+      
+      const usuarios = await this.usuarioService.obtenerUsuarios();
+      usuarios.forEach(u => {
+          u.autenticado = false;
+      });
+
+      await this.usuarioService.guardarListaUsuarios(usuarios);
+
       this.router.navigate(['login']);
     }
     else {
