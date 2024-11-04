@@ -1,10 +1,10 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+  <ion-toolbar color="secondary">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-item style="--background: transparent;">
-      <ion-title style="color: white;">Búsqueda de Viajes</ion-title>
+      <ion-title style="color: white;"><h2>Búsqueda de Viajes</h2></ion-title>
       <ion-icon name="person" color="light" size="large"></ion-icon>
     </ion-item>
     
@@ -38,7 +38,7 @@
             (click)="solicitarViaje(viaje)" 
             color="warning" 
             *ngIf="viaje.asientosDisponibles > 0">
-            Solicitar
+            Solicitar Viaje
           </ion-button>
           </ion-item>
         </ng-container>

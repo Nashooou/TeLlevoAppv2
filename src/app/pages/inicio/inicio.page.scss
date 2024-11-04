@@ -1,14 +1,22 @@
-.div-bienvenida{
-    display: flex;
-    justify-content: center;  // Centra horizontalmente
-    align-items: center;      // Centra verticalmente
-    height: 100%;
-    flex-direction: column;
-    
+ion-content {
+  display: flex;
+  justify-content: center;  /* Centra horizontalmente */
+  align-items: center;      /* Centra verticalmente */
+  height: 100vh;           /* Asegúrate de usar toda la altura de la ventana */
 }
 
+ion-card {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;   /* Asegura que el contenido esté en columna */
+  justify-content: center;  /* Centra el contenido horizontalmente */
+  align-items: center;      /* Centra el contenido verticalmente */
+  padding: 20px;           /* Añade un poco de padding */
+}
 
 ion-button {
   
-  margin: 10px 0; /* Ajusta el valor según necesites */
+  margin: 20px 0; /* Ajusta el valor según necesites */
 }
+
+
