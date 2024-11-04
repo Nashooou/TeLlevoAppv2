@@ -7,9 +7,10 @@ export interface Viaje {
   asientosDisponibles: number;
   precio: number;
   destino: string;
-  destinoCoordenadas: { lat: number; lng: number }; // Agrega este campo
+  destinoCoordenadas: { lat: number; lng: number };
   origen: { lat: number; lng: number };
   userViaje: string;
+  solicitantes?: string[]; // Nueva propiedad para almacenar los correos de solicitantes
 }
 
 
@@ -39,6 +40,10 @@ export class ViajeService {
 
   async obtenerViajes(): Promise<Viaje[]> {
     return (await this.storage.get('viajes')) || [];
+  }
+
+  async guardarListaViajes(viajes: Viaje[]) {
+    await this.storage.set('viajes', viajes);
   }
 
 }

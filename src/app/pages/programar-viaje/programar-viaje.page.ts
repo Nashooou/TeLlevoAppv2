@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ViajeService, Viaje } from 'src/app/services/ViajeService/viaje.service';
 import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
 import { ToastController } from '@ionic/angular/standalone';
@@ -44,8 +44,8 @@ export class ProgramarViajePage implements OnInit {
     private fb: FormBuilder,
     private viajeService: ViajeService,
     private usuarioService: UsuarioService,
-    private toastController:ToastController
-
+    private toastController:ToastController,
+    private router: Router
   ) { 
     this.programarForm = this.fb.group({
       hora: ['', [Validators.required]],
@@ -74,6 +74,11 @@ export class ProgramarViajePage implements OnInit {
       // Aquí puedes obtener el nombre del último usuario que inició sesión
       const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
       
+      if(!usuarioAutenticado){
+        console.log('No se encuentran usuarios autenticados')
+        return;
+      }
+
       // Obtenemos el destino del autocomplete
       const place = this.search.getPlace();
       const destino = place.geometry.location; // Coordenadas del destino
@@ -90,8 +95,11 @@ export class ProgramarViajePage implements OnInit {
           lng: destino.lng()  // Longitud
         },
         origen: this.puntoreferencia,
-        userViaje: usuarioAutenticado?.correo || 'defaultUser'
+        userViaje: usuarioAutenticado.correo,
+        solicitantes:[]
       };
+
+      
 
       await this.viajeService.guardarViaje(viaje);
       const toast = await this.toastController.create({
@@ -102,6 +110,7 @@ export class ProgramarViajePage implements OnInit {
       });
       await toast.present();
 
+      this.router.navigate(['/tabs/inicio']);
 
     } else {
       console.log('Formulario inválido');

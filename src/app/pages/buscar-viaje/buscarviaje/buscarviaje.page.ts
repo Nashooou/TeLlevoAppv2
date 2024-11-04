@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ViajeService, Viaje } from 'src/app/services/ViajeService/viaje.service';
-import { IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule } from '@ionic/angular';
 import { Router, NavigationEnd, RouterLink} from '@angular/router';
+import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
+import { ToastController } from '@ionic/angular/standalone';
 
 // declarar una variable de google
 declare var google: any;
@@ -23,31 +25,51 @@ declare var google: any;
 export class BuscarviajePage implements OnInit {
 
   viajes: any[] = []; // Aquí almacenaremos la información de los viajes
-  
+  nombreConductor: string='';
 
   constructor(
     private viajeService : ViajeService,
-    private router : Router
+    private usuarioService:UsuarioService,
+    private router : Router,
+    private toastController: ToastController,
+    private alertController: AlertController
   ) { 
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd && this.router.url === '/tabs/buscarviaje') {
-        this.ngOnInit(); // Recargar los datos del usuario y el vehículo al navegar de nuevo a la página
-      }
-    });
+    
   }
 
-  async ngOnInit() {
-    this.viajes = await this.viajeService.obtenerViajes() || [];
-    console.log('Viajes recuperados:', this.viajes);
+  ionViewWillEnter() {
+    this.ngOnInit(); // Recarga los datos del mapa y los viajes
+  }
+  
 
-    // Dibuja mapas y rutas para cada viaje
+  async ngOnInit() {
+    // Obtener usuarios desde el servicio y el usuario autenticado
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+  
+    if (!usuarioAutenticado) {
+      console.log('No se pudo obtener el usuario autenticado');
+      return;
+    }
+  
+    
+
+    // Obtener los viajes y filtrar los que no pertenecen al usuario autenticado
+    const todosLosViajes = await this.viajeService.obtenerViajes() || [];
+    this.viajes = todosLosViajes.filter((viaje: Viaje) => viaje.userViaje !== usuarioAutenticado.correo);
+    
+    
+  
+    // Dibuja mapas y rutas para cada viaje restante
     setTimeout(() => {
       this.viajes.forEach((viaje, index) => {
         const mapa = this.dibujarMapa(viaje, index); // Llama a dibujarMapa y obtiene el mapa
         this.calcularRuta(viaje, mapa); // Pasa el mapa a calcularRuta
+        
       });
     }, 0);
   }
+  
 
   dibujarMapa(viaje: any, index: number) {
     const mapElement = document.getElementById(`map${index}`);
@@ -99,4 +121,74 @@ export class BuscarviajePage implements OnInit {
       }
     });
   }
+
+
+  
+  async solicitarViaje(viaje: Viaje) {
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+    const usuarioAutenticado = usuarios.find((usuario) => usuario.autenticado === true);
+  
+    if (!usuarioAutenticado) {
+      console.log('No se pudo obtener el usuario autenticado');
+      return;
+    }
+  
+    // Evitar que el usuario solicite su propio viaje
+    if (viaje.userViaje === usuarioAutenticado.correo) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No puedes solicitar tu propio viaje.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+  
+    // Verificar si el usuario ya solicitó el viaje
+    if (viaje.solicitantes?.includes(usuarioAutenticado.correo)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ya solicitaste este viaje.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+      
+    }
+  
+    // Verificar si hay asientos disponibles
+    if (viaje.asientosDisponibles <= 0) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ya no quedan asientos disponibles.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+  
+    // Actualizar el viaje con el correo del solicitante y descontar un asiento
+    viaje.asientosDisponibles--;
+    if (!viaje.solicitantes) viaje.solicitantes = []; // Inicializar la lista si está indefinida
+    viaje.solicitantes.push(usuarioAutenticado.correo);
+  
+    // Guardar los cambios en el almacenamiento
+    await this.viajeService.guardarListaViajes(this.viajes);
+  
+    // Mostrar confirmación al usuario
+    const toast = await this.toastController.create({
+      message: 'Solicitud realizada exitosamente',
+      duration: 2000,
+      color: 'success',
+      position: 'bottom'
+    });
+    await toast.present();
+
+    this.router.navigate(['/tabs/inicio']);
+  }
+
+  irInicio(){
+    this.router.navigate(['/tabs/inicio']);
+  }
+
 }

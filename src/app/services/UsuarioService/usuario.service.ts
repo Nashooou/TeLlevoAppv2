@@ -53,7 +53,10 @@ export class UsuarioService {
   }
 
 
-
+  async usuarioAutenticado(): Promise<boolean> {
+    const usuarios = await this.obtenerUsuarios();
+    return usuarios.some(u => u.autenticado === true);
+  }
   
   async actualizarUsuario(usuario: Usuario) {
     const usuarios = await this.obtenerUsuarios();

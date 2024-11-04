@@ -35,11 +35,12 @@ import { UsuarioService } from './services/UsuarioService/usuario.service';
 })
 export class AppComponent {
   showMenu: boolean = false;
-  
+  isAutenticado: boolean = false;
 
   constructor(
     private router: Router,
-    private usuarioService:UsuarioService
+    private usuarioService:UsuarioService,
+    
   ) {
     // this.showMenu = false;
     // Registro de íconos
@@ -53,23 +54,27 @@ export class AppComponent {
   }
 
   //DECLARAR VARIABLA QUE PERMITE ACCEDER A LAS RUTAS (IONROUTEROUTLET)
-  @ViewChild(IonRouterOutlet, { static: true }) outlet!: IonRouterOutlet;
+  // @ViewChild(IonRouterOutlet, { static: true }) outlet!: IonRouterOutlet;
 
   //SE EJECUTA LUEGO DE QUE LA VISTA SE INICIA
-  ngAfterViewInit() {
-    //CREA UNA SUBSCRIPCIÓN AL EVENTO PARA "MIRAR VARIABLE" CUANDO CAMBIA DE ESTADO
-    this.outlet.activateEvents.subscribe((component) => {
-      //si ese componente es LoginPage, te suscribes al evento datosAlPadre
-      if (component instanceof LoginPage) {
-        //Cuando el evento es emitido, se ejecuta la función de callback y puedes manejar 
-        //el valor recibido (true en este caso) para actualizar el estado
-        // en el componente padre (por ejemplo, mostrando u ocultando un menú).
-        component.datosAlPadre.subscribe((valor) => { this.showMenu = valor;});
-      }
-    });
+  async ngAfterViewInit() {
+    const isAutenticado= await this.usuarioService.usuarioAutenticado();
+
+    if(isAutenticado){
+      this.showMenu = true
+    }
+    
+    // //CREA UNA SUBSCRIPCIÓN AL EVENTO PARA "MIRAR VARIABLE" CUANDO CAMBIA DE ESTADO
+    // this.outlet.activateEvents.subscribe((component) => {
+    //   //si ese componente es LoginPage, te suscribes al evento datosAlPadre
+    //   if (component instanceof LoginPage) {
+    //     //Cuando el evento es emitido, se ejecuta la función de callback y puedes manejar 
+    //     //el valor recibido (true en este caso) para actualizar el estado
+    //     // en el componente padre (por ejemplo, mostrando u ocultando un menú).
+    //     component.datosAlPadre.subscribe((valor) => { this.showMenu = valor;});
+    //   }
+    // });
   }
-
-
 
 
   async clickOpcionMenu(link: string) {
@@ -83,8 +88,8 @@ export class AppComponent {
       });
 
       await this.usuarioService.guardarListaUsuarios(usuarios);
-
-      this.router.navigate(['login']);
+      window.location.href = '/login';
+      // this.router.navigate(['login']);
     }
     else {
       this.showMenu = true;

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { home } from 'ionicons/icons';
 import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
+import { ViajeService } from 'src/app/services/ViajeService/viaje.service';
 
 @Component({
   selector: 'app-inicio',
@@ -19,15 +19,27 @@ export class InicioPage implements OnInit {
 
   // Variables
   par_nombre: string = "Login";
+  showBtnProgramar:boolean=false;
+  showAvisoVehiculo:boolean=true;
+  showBtnVerViaje:boolean=false;
+  viajes: any[] = [];
+
 
   constructor(
     private router: Router,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private viajeService: ViajeService
   ) {
     
 
     addIcons({
       'home':home
+    });
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd && this.router.url === '/tabs/inicio') {
+        this.ngOnInit(); // Recargar los datos del usuario y el vehículo al navegar de nuevo a la página
+      }
     });
 
   }
@@ -39,15 +51,49 @@ export class InicioPage implements OnInit {
     // Aquí puedes obtener el nombre del último usuario que inició sesión
     const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
     
-    if (usuarioAutenticado) {
-      // Asignar el atributo a la variable que mostraremos
-      this.par_nombre = usuarioAutenticado.nombre;
+    if (!usuarioAutenticado) {
+      console.log('No se pudo obtener el usuario autenticado')
+      return;
     }
+    // Asignar el atributo a la variable que mostraremos
+    this.par_nombre = usuarioAutenticado.nombre;
+    
+    this.viajes = await this.viajeService.obtenerViajes() || [];
+
+    const viajeUsuario = this.viajes.find((viaje: any) => viaje.userViaje === usuarioAutenticado.correo);
+
+    
+    //Si el usuario no tiene un vehiculo registrado se muestra aviso de registro de vehiculo
+    if(!usuarioAutenticado.tieneAuto && !viajeUsuario){
+      this.showAvisoVehiculo = true;
+      this.showBtnVerViaje = false;
+      this.showBtnProgramar = false;
+      return;
+    }
+
+    //Si el usuario tiene un vehiculo pero no tiene un viaje programado aún, se muestra el botón para programar viaje
+    if(usuarioAutenticado.tieneAuto && !viajeUsuario){
+      this.showAvisoVehiculo = false;
+      this.showBtnVerViaje = false;
+      this.showBtnProgramar = true;
+      return;
+    }
+    
+    if(usuarioAutenticado.tieneAuto && viajeUsuario){
+      this.showAvisoVehiculo = false;
+      this.showBtnVerViaje = true;
+      this.showBtnProgramar = false;
+    }
+
   }
 
-  irBuscarViaje(){
-    this.router.navigate(['/tabs/buscarviaje']);
+  irBuscarViaje() {
+    window.location.href = '/tabs/buscarviaje';
   }
-
+  
+  irViajeProgramado() {
+    window.location.href = '/tabs/ver-viaje-detalle';
+  }
+  
 
 }

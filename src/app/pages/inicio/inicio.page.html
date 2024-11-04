@@ -15,10 +15,13 @@
   <div class="div-bienvenida">
     <ion-label><h1>Bienvenido, {{ par_nombre }}</h1></ion-label>
     
-    <ion-button shape="round" (click)="irBuscarViaje()">Buscar Viaje</ion-button>
+    <ion-button shape="round" (click)="irBuscarViaje()">Buscar Viajes</ion-button>
+    
+    <ion-label *ngIf="showAvisoVehiculo"><h2>Para programar un viaje necesitas registrar un vehículo primero.</h2></ion-label>
 
-    <ion-button shape="round" [routerLink]="['/tabs/programar-viaje']">Programar Viaje</ion-button>
-  
+    <ion-button *ngIf="showBtnProgramar" shape="round" [routerLink]="['/tabs/programar-viaje']">Programar Viaje</ion-button>
+    
+    <ion-button *ngIf="showBtnVerViaje" shape="round" (click)="irViajeProgramado()">Ver Viaje Programado</ion-button>
   </div>
 
   
