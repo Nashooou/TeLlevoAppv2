@@ -60,7 +60,7 @@ export class PerfilUsuarioPage implements OnInit {
     
 
     const vehiculos = await this.vehiculoService.obtenerVehiculos();
-    const vehiculoObj = vehiculos.find((vehiculo: any) => vehiculo.userPropietario === usuarioAutenticado?.username);
+    const vehiculoObj = vehiculos.find((vehiculo: any) => vehiculo.userPropietario === usuarioAutenticado?.correo);
 
     if (usuarioAutenticado) {
 

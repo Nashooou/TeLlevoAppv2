@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { ViajeService, Viaje } from 'src/app/services/ViajeService/viaje.service';
+import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
+import { ToastController } from '@ionic/angular/standalone';
 
 //declarar una variable de google
 declare var google:any;
@@ -37,15 +40,20 @@ export class ProgramarViajePage implements OnInit {
 
 
   constructor(
-    private fb: FormBuilder
+
+    private fb: FormBuilder,
+    private viajeService: ViajeService,
+    private usuarioService: UsuarioService,
+    private toastController:ToastController,
+    private router: Router
   ) { 
     this.programarForm = this.fb.group({
       hora: ['', [Validators.required]],
-      asientosDisponibles: [null, 
+      asientosDisponibles: ['', 
         [
           Validators.required, 
           Validators.min(1), 
-          Validators.max(10)
+          Validators.max(4)
         ]],
       precio: ['', [
         Validators.required, 
@@ -55,10 +63,55 @@ export class ProgramarViajePage implements OnInit {
     });
   }
 
-  onSubmit() {
+  async onSubmit() {
+
+
+
     if (this.programarForm.valid) {
-      console.log('Formulario válido', this.programarForm.value);
-      // Aquí puedes manejar la lógica para enviar los datos
+      // Obtener usuarios desde el servicio
+      const usuarios = await this.usuarioService.obtenerUsuarios();
+      
+      // Aquí puedes obtener el nombre del último usuario que inició sesión
+      const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+      
+      if(!usuarioAutenticado){
+        console.log('No se encuentran usuarios autenticados')
+        return;
+      }
+
+      // Obtenemos el destino del autocomplete
+      const place = this.search.getPlace();
+      const destino = place.geometry.location; // Coordenadas del destino
+
+
+      // Creamos el objeto viaje incluyendo las coordenadas
+      const viaje: Viaje = {
+        hora: this.programarForm.get('hora')?.value,
+        asientosDisponibles: this.programarForm.get('asientosDisponibles')?.value,
+        precio: this.programarForm.get('precio')?.value,
+        destino: place.formatted_address, // Puedes usar el nombre del lugar
+        destinoCoordenadas: {
+          lat: destino.lat(), // Latitud
+          lng: destino.lng()  // Longitud
+        },
+        origen: this.puntoreferencia,
+        userViaje: usuarioAutenticado.correo,
+        solicitantes:[]
+      };
+
+      
+
+      await this.viajeService.guardarViaje(viaje);
+      const toast = await this.toastController.create({
+        message: 'Viaje Programado Correctamente',
+        duration: 2000,
+        color: 'success',
+        position: 'bottom'
+      });
+      await toast.present();
+
+      this.router.navigate(['/tabs/inicio']);
+
     } else {
       console.log('Formulario inválido');
       this.programarForm.markAllAsTouched(); // Marca todos los campos como tocados para mostrar los errores
@@ -108,66 +161,63 @@ export class ProgramarViajePage implements OnInit {
   } // fin dibujar mapa
 
 
-  buscaDireccion(mapaLocal:any,marcadorLocal:any){
-    var input=document.getElementById('autocomplete')
-
-    if(input){
-      const autocomplete=new google.maps.places.Autocomplete(input);
-      this.search=autocomplete;
-
-      // Agregamos el movimiento al mapa
-     autocomplete.addListener('place_changed',function(){
-     const place=autocomplete.getPlace().geometry.location;  // lat y long del texto de la caja
-     mapaLocal.setCenter(place); 
-     mapaLocal.setZoom(13);
-     marcadorLocal.setPosition(place); 
-
-     });
-
-
-
-     }else {
+  buscaDireccion(mapaLocal: any, marcadorLocal: any) {
+    var input = document.getElementById('autocomplete');
+  
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input);
+      this.search = autocomplete;
+  
+      // Agregamos el listener para detectar cambios en el lugar seleccionado
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+  
+        // Validamos si el lugar tiene coordenadas válidas
+        if (place.geometry && place.geometry.location) {
+          const destino = place.geometry.location;
+  
+          // Centrar el mapa y ajustar el marcador
+          mapaLocal.setCenter(destino);
+          mapaLocal.setZoom(13);
+          marcadorLocal.setPosition(destino);
+  
+          // Llamar a calculaRuta para trazar la ruta
+          this.calculaRuta();
+        } else {
+          alert('El lugar seleccionado no tiene coordenadas válidas.');
+        }
+      });
+    } else {
       alert("Elemento con id=autocomplete no encontrado");
-     }// fin if
-
-
-     
-  } // fin busca direccion
-
-  calculaRuta(){
-    //alert('Calculo de la ruta en progreso');
-
-    const origen=this.puntoreferencia;
-    const destino=this.search.getPlace().geometry.location;
-
-
-    const  request={
-      origin: origen,
-      destination:destino,
-      travelMode: google.maps.TravelMode.DRIVING
-    };
-
-    this.directionsService.route(request,
-          (result:any,status:any) =>{
-            if (status === google.maps.DirectionsStatus.OK){
-              this.directionsRenderer.setDirections(result)
-            }else{
-              alert('Error al calcular ruta');
-            }
-            this.marker.setPosition(null)
-
-          }
-        
-        
-        
-        
-        )//fin result service
+    }
+  }
 
 
 
+  calculaRuta() {
+  const origen = this.puntoreferencia;
 
+    // Obtenemos el destino desde `this.search`
+    if (this.search && this.search.getPlace() && this.search.getPlace().geometry) {
+      const destino = this.search.getPlace().geometry.location;
 
+      const request = {
+        origin: origen,
+        destination: destino,
+        travelMode: google.maps.TravelMode.DRIVING
+      };
 
+      this.directionsService.route(request, (result: any, status: any) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          this.directionsRenderer.setDirections(result);
+        } else {
+          alert('Error al calcular ruta');
+        }
+        this.marker.setPosition(null);
+      });
+    } else {
+      alert('El destino no está definido correctamente.');
+    }
 
-  } // fin calcula ruta
+  }
 }

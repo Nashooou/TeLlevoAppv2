@@ -16,9 +16,15 @@ export const routes: Routes = [
       { path: 'programar-viaje', loadComponent: () => import('./pages/programar-viaje/programar-viaje.page').then(m => m.ProgramarViajePage) },
       { path: 'registravehiculo', loadComponent: () => import('./pages/crud/registravehiculo/registravehiculo.page').then(m => m.RegistravehiculoPage) },
       { path: 'editavehiculo', loadComponent: () => import('./pages/crud/editavehiculo/editavehiculo/editavehiculo.page').then( m => m.EditavehiculoPage) },
+      { path: 'buscarviaje', loadComponent: () => import('./pages/buscar-viaje/buscarviaje/buscarviaje.page').then( m => m.BuscarviajePage)},
+      { path: 'ver-viaje-detalle', loadComponent: () => import('./pages/crud/verviajedetalle/ver-viaje-detalle/ver-viaje-detalle.page').then( m => m.VerViajeDetallePage)},
       { path: '', redirectTo: 'inicio', pathMatch: 'full' } // Redirige a la página "inicio" por defecto
     ]
   },
+  
+
+  
+
   
 
 

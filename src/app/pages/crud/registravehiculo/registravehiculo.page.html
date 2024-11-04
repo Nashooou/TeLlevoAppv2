@@ -98,19 +98,19 @@
 
 
           
+         
           <ion-item>
-            <ion-input 
-              type="number"
-              formControlName="asientos" 
-              label="Total Asientos" 
-              label-placement="floating" 
-              fill="undefined" 
-              placeholder="Total Asientos"
-              min="2"
-              max="5"
-              maxlength="1">
-            </ion-input>
+            <ion-select formControlName="asientos" interface="popover" placeholder="Total Asientos">
+              <ion-label>Selecciona la cantidad de asientos:</ion-label>
+              <ion-select-option value="2">2</ion-select-option>
+              <ion-select-option value="3">3</ion-select-option>
+              <ion-select-option value="4">4</ion-select-option>
+              <ion-select-option value="5">5</ion-select-option>
+              
+            </ion-select>
           </ion-item>
+
+           
           
           <div *ngIf="registraVehiculoForm.get('asientos')?.invalid && registraVehiculoForm.get('asientos')?.touched">
             Debes ingresar la cantidad total de asientos.

@@ -5,6 +5,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonTabs } from '@ionic/ang
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { home, airplane } from 'ionicons/icons';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tabs',
@@ -15,7 +16,9 @@ import { home, airplane } from 'ionicons/icons';
 })
 export class TabsPage implements OnInit {
 
-  constructor() { 
+  constructor(
+    private router:Router
+  ) { 
     addIcons({
       'home': home,
       'airplane': airplane
@@ -26,4 +29,7 @@ export class TabsPage implements OnInit {
   ngOnInit() {
   }
 
+  irInicio(){
+    this.router.navigate(['/tabs/inicio']);
+  }
 }

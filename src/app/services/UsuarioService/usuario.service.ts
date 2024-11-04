@@ -4,7 +4,7 @@ import { Storage } from '@ionic/storage-angular';
 export interface Usuario {
   nombre: string;
   apellido: string;
-  username: string;
+  // username: string;
   correo: string;
   password: string;
   autenticado:boolean;
@@ -53,7 +53,10 @@ export class UsuarioService {
   }
 
 
-
+  async usuarioAutenticado(): Promise<boolean> {
+    const usuarios = await this.obtenerUsuarios();
+    return usuarios.some(u => u.autenticado === true);
+  }
   
   async actualizarUsuario(usuario: Usuario) {
     const usuarios = await this.obtenerUsuarios();
@@ -78,9 +81,9 @@ export class UsuarioService {
 
   
   // Verifica si un usuario ya existe
-  async existeUsuario(username: string, correo: string): Promise<boolean> {
+  async existeUsuario(correo: string): Promise<boolean> {
     const usuarios = await this.obtenerUsuarios();
-    return usuarios.some(u => u.username === username || u.correo === correo);
+    return usuarios.some(u => u.correo === correo);
   }
 
   // Verifica si las credenciales son válidas

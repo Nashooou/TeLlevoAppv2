@@ -31,7 +31,7 @@ export class LoginPage {
   
   // OUTPUT PERMITE COMPARTIR DATOS DESDE UN COMPONENTE HIJO A UN PADRE POR MEDIO DE EMISIÓN DE EVENTOS
   // OUTPUT decorador que se usa para emitir eventos desde un componente hijo hacia su componente padre.
-  @Output() datosAlPadre = new EventEmitter<boolean>();
+  // @Output() datosAlPadre = new EventEmitter<boolean>();
 
   constructor(
     private fb:FormBuilder, 
@@ -81,7 +81,7 @@ export class LoginPage {
     const correoMinuscula = this.todoMinuscula(f.correo);
 
     // Verificar si el usuario existe por correo
-    const existeUsuario = await this.usuarioService.existeUsuario('', correoMinuscula); // Solo verificamos el correo
+    const existeUsuario = await this.usuarioService.existeUsuario(correoMinuscula); // Solo verificamos el correo
 
     if (!existeUsuario) {
       // Si no hay usuario almacenado en localStorage
@@ -119,10 +119,11 @@ export class LoginPage {
       }
       
       // Navegar a la página de inicio
-      this.router.navigate(['/tabs/inicio']);
+      window.location.href = '/tabs/inicio';
+      // this.router.navigate(['/tabs/inicio']);
       
       // Emitir el valor true al componente padre
-      this.datosAlPadre.emit(true);
+      // this.datosAlPadre.emit(true);
 
     } else {
       // Si las credenciales no coinciden

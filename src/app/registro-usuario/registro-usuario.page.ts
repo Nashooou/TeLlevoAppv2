@@ -38,12 +38,12 @@ export class RegistroUsuarioPage implements OnInit {
         Validators.required,
         Validators.pattern('^[a-zA-Z0-9._%+-]+@duocuc\.cl$'),
       ]],
-      username: ['', [
-        Validators.required,
-        Validators.pattern('^[a-zA-Z0-9]+$'),
-        Validators.minLength(4),
-        Validators.maxLength(8),
-      ]],
+      // username: ['', [
+      //   Validators.required,
+      //   Validators.pattern('^[a-zA-Z0-9]+$'),
+      //   Validators.minLength(4),
+      //   Validators.maxLength(8),
+      // ]],
       password: ['', [
         Validators.required,
         Validators.minLength(4),
@@ -79,14 +79,14 @@ export class RegistroUsuarioPage implements OnInit {
   
     const nombreCapitalizado = this.primeraLetraMayuscula(f.nombre);
     const apellidoCapitalizado = this.primeraLetraMayuscula(f.apellido);
-    const usuarioMinuscula = this.todoMinuscula(f.username);
+    // const usuarioMinuscula = this.todoMinuscula(f.username);
     const correoMinuscula = this.todoMinuscula(f.correo);
 
     //Crear objeto usuario
     const usuario: Usuario = {
       nombre: nombreCapitalizado,
       apellido: apellidoCapitalizado,
-      username: usuarioMinuscula,
+      // username: usuarioMinuscula,
       correo: correoMinuscula,
       password: f.password,
       autenticado: false,
@@ -94,7 +94,7 @@ export class RegistroUsuarioPage implements OnInit {
     };
 
     // Verificar si el usuario existe
-    const existe = await this.usuarioService.existeUsuario(usuario.username, usuario.correo);
+    const existe = await this.usuarioService.existeUsuario(usuario.correo);
     if (existe) {
       const alert = await this.alertController.create({
         header: 'Error',

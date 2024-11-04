@@ -52,9 +52,8 @@ export class RegistravehiculoPage implements OnInit {
       ]],
       asientos: ['', [
         Validators.required,
-        Validators.min(2), // Capacidad mínima
-        Validators.max(5),
-        Validators.maxLength(1)
+        Validators.min(1), // Capacidad mínima
+        Validators.max(5),        
       ]],
       color: ['', [
         Validators.required,
@@ -113,7 +112,7 @@ export class RegistravehiculoPage implements OnInit {
       anio: f.anio,
       asientos: f.asientos,
       color: colorCApitalizada,
-      userPropietario: usuarioAutenticado.username || 'defaultUser'
+      userPropietario: usuarioAutenticado.correo || 'defaultUser'
     };
 
     try {

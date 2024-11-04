@@ -12,68 +12,76 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card-header>
-    <ion-card-title>Programa tu regreso a casa</ion-card-title>
-  </ion-card-header>
-
-
   <div id="map"></div>
-
-
-  <form [formGroup]="programarForm" (ngSubmit)="onSubmit()">
-    
-
-    <ion-card-content>
-      <ion-label position="floating">Hora de Salida</ion-label>
-      <ion-item>
-        
-        <ion-input type="time" formControlName="hora" placeholder="Hora de salida"></ion-input>
-      </ion-item>
-      <div id="error" *ngIf="programarForm.get('hora')?.invalid && programarForm.get('hora')?.touched">
-        <p *ngIf="programarForm.get('hora')?.errors?.['required']">La hora es requerida.</p>
-      </div>
-
-      <ion-label position="floating">Asientos Disponibles</ion-label>
-      <ion-item>
-        
-        <ion-select formControlName="asientosDisponibles" placeholder="1">
-          <ion-label>Selecciona los asientos disponibles</ion-label>
-          <ion-select-option *ngFor="let i of [].constructor(4); let index = index" [value]="index + 1">{{ index + 1 }}</ion-select-option>
-        </ion-select>
-      </ion-item>
-      <div id="error" *ngIf="programarForm.get('asientosDisponibles')?.invalid && programarForm.get('asientosDisponibles')?.touched">
-        <p *ngIf="programarForm.get('asientosDisponibles')?.errors?.['required']">Los asientos son requeridos.</p>
-        <p *ngIf="programarForm.get('asientosDisponibles')?.errors?.['min']">Selecciona al menos 1 asiento.</p>
-        <p *ngIf="programarForm.get('asientosDisponibles')?.errors?.['max']">Máximo 4 asientos disponibles.</p>
-      </div>
-
-      <ion-label position="floating">Precio $</ion-label>
-      <ion-item>
-        
-        <ion-input type="number" formControlName="precio" placeholder="Precio de viaje"></ion-input>
-      </ion-item>
-      <div id="error"  *ngIf="programarForm.get('precio')?.invalid && programarForm.get('precio')?.touched">
-        <p *ngIf="programarForm.get('precio')?.errors?.['required']">El precio es requerido.</p>
-        <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio no puede ser negativo.</p>
-      </div>
-
-      
-
-      <ion-item>
-        <input formControlName="destino" placeholder="Ingresa tu Destino" type="text" id="autocomplete">
-      </ion-item>
-      <div id="error"  *ngIf="programarForm.get('destino')?.invalid && programarForm.get('destino')?.touched">
-        <p *ngIf="programarForm.get('destino')?.errors?.['required']">Debes ingresar un destino válido.</p>
-      </div>
-      
-    </ion-card-content>
-    
-  </form>
-
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Programa tu regreso a casa</ion-card-title>
+    </ion-card-header>
   
   
-  <ion-button color="warning" shape="round" expand="block" (click)="calculaRuta()">Calcular Regreso</ion-button>
-  <ion-button color="secondary" shape="round" [routerLink]="['/tabs/inicio']" expand="block">Volver</ion-button>
+    
+  
+  
+    <form [formGroup]="programarForm" (ngSubmit)="onSubmit()">
+      
+  
+      <ion-card-content>
+        <ion-label position="floating">Destino</ion-label>
+        <ion-item>
+          <input  formControlName="destino" placeholder="Ingresa tu Destino" type="text" id="autocomplete">
+        </ion-item>
+        <div id="error"  *ngIf="programarForm.get('destino')?.invalid && programarForm.get('destino')?.touched">
+          <p *ngIf="programarForm.get('destino')?.errors?.['required']">Debes ingresar un destino válido.</p>
+        </div>
+  
+  
+  
+        <ion-label position="floating">Hora de Salida</ion-label>
+        <ion-item>
+          <ion-input type="time" formControlName="hora" placeholder="Hora de salida"></ion-input>
+        </ion-item>
+        <div id="error" *ngIf="programarForm.get('hora')?.invalid && programarForm.get('hora')?.touched">
+          <p *ngIf="programarForm.get('hora')?.errors?.['required']">La hora es requerida.</p>
+        </div>
+  
+  
+        <ion-label position="floating">Pasajeros Disponibles</ion-label>
+        <ion-item>
+          <ion-select formControlName="asientosDisponibles" interface="popover" placeholder="1">
+            <ion-label>Selecciona total de pasajeros para este viaje:</ion-label>
+            <ion-select-option value="1">1</ion-select-option>
+            <ion-select-option value="2">2</ion-select-option>
+            <ion-select-option value="3">3</ion-select-option>
+            <ion-select-option value="4">4</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <div id="error" *ngIf="programarForm.get('asientosDisponibles')?.invalid && programarForm.get('asientosDisponibles')?.touched">
+          Debes seleccionar la cantidad de pasajeros.
+          
+        </div>
+  
+  
+  
+        <ion-label position="floating">Precio $</ion-label>
+        <ion-item>
+          
+          <ion-input type="number" formControlName="precio" placeholder="Precio de viaje"></ion-input>
+        </ion-item>
+        <div id="error"  *ngIf="programarForm.get('precio')?.invalid && programarForm.get('precio')?.touched">
+          <p *ngIf="programarForm.get('precio')?.errors?.['required']">El precio es requerido.</p>
+          <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio no puede ser negativo.</p>
+        </div>
+  
+        
+  
+        
+        
+      </ion-card-content>
+      <ion-button color="warning" shape="round" expand="block" type="submit">Confirmar Viaje</ion-button>
+      <ion-button color="secondary" shape="round" [routerLink]="['/tabs/inicio']" expand="block">Volver</ion-button>
+    </form>  
+  </ion-card>
+  
   
   <div id="trayecto"></div>
 
