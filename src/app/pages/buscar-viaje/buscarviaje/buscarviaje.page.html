@@ -32,9 +32,14 @@
               <p>Precio: {{ viaje.precio | currency }}</p>
             </ion-label>
     
-            <!-- Botón para solicitar viaje -->
+            <!-- Mostrar mensaje si ya hay un viaje solicitado -->
+            <!-- <ion-label *ngIf="tieneViajeSolicitado" color="danger">
+              Ya tienes un viaje solicitado. No puedes solicitar otro hasta cancelar el actual.
+            </ion-label> -->
+    
+            <!-- Botón para solicitar viaje (solo si no hay viaje pendiente) -->
             <ion-button 
-              *ngIf="viaje.asientosDisponibles > 0 && !isViajeSolicitado(viaje)"
+              *ngIf="!tieneViajeSolicitado && !isViajeSolicitado(viaje) && viaje.asientosDisponibles > 0"
               (click)="solicitarViaje(viaje)" 
               color="warning">
               Solicitar Viaje

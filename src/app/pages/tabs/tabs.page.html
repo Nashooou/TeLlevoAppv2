@@ -8,12 +8,12 @@
   <ion-tabs>
     <ion-tab-bar slot="bottom" color="secondary">
   
-      <ion-tab-button tab="inicio" (click)="irInicio()" routerLinkActive="active">
+      <ion-tab-button tab="inicio" (click)="irInicio()"  routerLinkActive="selected">
         <ion-icon name="home"></ion-icon>
         <ion-label><h3>Inicio</h3></ion-label>
       </ion-tab-button>
   
-      <ion-tab-button tab="viajes" (click)="irViajeProgramado()">
+      <ion-tab-button tab="viajes" (click)="irViajeProgramado()"  routerLinkActive="selected">
         <ion-icon name="airplane"></ion-icon>
         <ion-label><h3>Mis Viajes</h3></ion-label>
       </ion-tab-button>

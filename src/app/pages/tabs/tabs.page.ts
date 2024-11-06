@@ -5,14 +5,20 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonTabs } from '@ionic/ang
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { home, airplane } from 'ionicons/icons';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: './tabs.page.html',
   styleUrls: ['./tabs.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    IonicModule, 
+    CommonModule, 
+    FormsModule,
+    RouterLinkActive,
+    RouterLink
+  ]
 })
 export class TabsPage implements OnInit {
 

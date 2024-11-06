@@ -93,8 +93,8 @@ export class AppComponent {
       });
 
       await this.usuarioService.guardarListaUsuarios(usuarios);
-      window.location.href = '/login';
-      // this.router.navigate(['login']);
+      // window.location.href = '/login';
+      this.router.navigate(['login']);
     }
     else {
       this.showMenu = true;
