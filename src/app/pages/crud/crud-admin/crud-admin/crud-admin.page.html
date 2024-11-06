@@ -1,0 +1,57 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="secondary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-item style="--background: transparent;">
+      <ion-title style="color: white;"><h3>CRUD ADMIN</h3></ion-title>
+      <ion-icon name="person" color="light" size="large"></ion-icon>
+    </ion-item>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ng-container *ngIf="usuarios && usuarios.length; else noUsuarios">
+    <!-- Si hay usuarios, muestra el listado -->
+    <ion-card color="secondary" *ngFor="let usuario of usuarios">
+      <ion-card-header>
+        <ion-card-title><h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4></ion-card-title>
+        <ion-item>
+          <h4>{{ usuario.correo }}</h4> <!-- Mostrar el correo del usuario -->
+          <ion-button color="danger" (click)="eliminarUsuario(usuario.correo)" slot="end">Eliminar</ion-button>
+        </ion-item>
+      </ion-card-header>
+      <ion-card-content>
+        
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <!-- Si no hay usuarios, muestra el mensaje alternativo -->
+  <ng-template #noUsuarios>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Usuarios Registrados</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label>No existen usuarios registrados.</ion-label>
+        </ion-item>
+      </ion-card-content>
+
+      
+    </ion-card>
+    
+  </ng-template>
+  
+  <ion-button color="warning" shape="round" (click)="clickOpcionMenu()"><h5>Salir</h5></ion-button>
+  
+  
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="secondary">
+    <ion-title><h2>Duoc UC - 2024</h2></ion-title>
+  </ion-toolbar>
+</ion-footer>

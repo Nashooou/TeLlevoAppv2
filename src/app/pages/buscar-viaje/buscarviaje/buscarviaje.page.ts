@@ -255,7 +255,7 @@ export class BuscarviajePage implements OnInit {
   }
 
 
-
+ 
 
 
 
@@ -271,18 +271,20 @@ export class BuscarviajePage implements OnInit {
       await alert.present();
       return;
     }
-
-
+  
+    // Si el usuario está en la lista de solicitantes, lo eliminamos
     if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
       viaje.solicitantes = viaje.solicitantes.filter(
         (correo) => correo !== this.usuarioAutenticado.correo
       );
-      viaje.asientosDisponibles++;
-
+      viaje.asientosDisponibles++;  // Liberamos un asiento disponible
+  
+      // Guardar los cambios
       await this.viajeService.guardarListaViajes(this.viajes);
-
+  
+      // Restablecer la solicitud realizada
       this.viajeSolicitado = null;
-
+  
       const toast = await this.toastController.create({
         message: 'Solicitud cancelada exitosamente',
         duration: 2000,

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { ViajeService, Viaje } from 'src/app/services/ViajeService/viaje.service';
@@ -48,7 +48,10 @@ export class ProgramarViajePage implements OnInit {
     private router: Router
   ) { 
     this.programarForm = this.fb.group({
-      hora: ['', [Validators.required]],
+      hora: ['', [
+        Validators.required,
+        this.validarHoraMinima
+      ]],
       asientosDisponibles: ['', 
         [
           Validators.required, 
@@ -57,15 +60,13 @@ export class ProgramarViajePage implements OnInit {
         ]],
       precio: ['', [
         Validators.required, 
-        Validators.min(0)
+        Validators.min(1)
       ]],
       destino: ['',Validators.required]
     });
   }
 
   async onSubmit() {
-
-
 
     if (this.programarForm.valid) {
       // Obtener usuarios desde el servicio
@@ -124,6 +125,8 @@ export class ProgramarViajePage implements OnInit {
     this.buscaDireccion(this.mapa,this.marker)
 
   }
+
+
 
   dibujarMapa(){
     var mapElement=document.getElementById('map')
@@ -220,4 +223,33 @@ export class ProgramarViajePage implements OnInit {
     }
 
   }
+
+
+  // Método de validación personalizada
+validarHoraMinima(control: AbstractControl): { [key: string]: any } | null {
+  const horaActual = new Date();
+  const horaIngreso = control.value;
+  
+  // Verificar que se haya ingresado una hora válida
+  if (!horaIngreso) {
+    return null;
+  }
+
+  // Convertir la hora ingresada a un objeto Date
+  const [hora, minuto] = horaIngreso.split(':');
+  const fechaViaje = new Date(horaActual);
+  fechaViaje.setHours(Number(hora), Number(minuto), 0, 0); // Establecer la hora del viaje
+
+  // Validar que el viaje esté al menos 30 minutos en el futuro
+  const diferenciaMinutos = (fechaViaje.getTime() - horaActual.getTime()) / (1000 * 60);
+  
+  if (diferenciaMinutos < 20) {
+    return { 'horaInvalida': true }; // Si la diferencia es menor a 20 minutos
+  }
+
+  return null; // Si pasa la validación
+}
+
+
+
 }

@@ -6,8 +6,8 @@
       <ion-content>
         <ion-list id="inbox-list">
           
-          <ion-list-header>Menú Principal</ion-list-header>
-          <ion-note>TeLlevoApp</ion-note>
+          <ion-list-header>{{ par_nombre }}</ion-list-header>
+          <ion-note>Menú Principal</ion-note>
           
           <ion-menu-toggle auto-hide="false"> 
             <ion-item (click)="clickOpcionMenu('')" routerLink="/tabs/inicio" lines="none" detail="false" routerLinkActive="selected">
@@ -20,6 +20,11 @@
               <ion-icon name="person" slot="start" size="large"></ion-icon>
               <ion-label><h2>Mi perfil</h2></ion-label>
             </ion-item>
+
+            <!-- <ion-item *ngIf="showCrudAdmin" routerLink="/tabs/crud-admin" lines="none" detail="false" routerLinkActive="selected">
+              <ion-icon name="person" slot="start" size="large"></ion-icon>
+              <ion-label><h2>CRUD Admin</h2></ion-label>
+            </ion-item> -->
 
             <ion-item (click)="clickOpcionMenu('/login')" routerLink="login" lines="none" detail="false">
               <ion-icon name="logout" slot="start" size="large"></ion-icon>

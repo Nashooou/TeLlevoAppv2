@@ -41,12 +41,14 @@ export class EditaperfilPage  {
       ]],
       password: ['', [
         Validators.required,
-        Validators.minLength(4),
+        Validators.minLength(5),
+        Validators.maxLength(10),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]],
       password2: ['', [
         Validators.required,
-        Validators.minLength(4),
+        Validators.minLength(5),
+        Validators.maxLength(10),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]]
     });

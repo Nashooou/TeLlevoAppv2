@@ -8,86 +8,97 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="recuadro">
-    <form [formGroup]="editaFormVehiculo" (ngSubmit)="guardarCambios()">
-      <ion-card>
+  <form [formGroup]="editaFormVehiculo" (ngSubmit)="guardarCambios()">
+    
+    <ion-card>
+      <ion-grid>
+        
         <ion-card-header>
-          <ion-card-title>Editar Vehiculo</ion-card-title>
+          <ion-item>
+            <ion-card-title>Editar Vehículo</ion-card-title>
+          </ion-item>
         </ion-card-header>
-      
+        
         <ion-card-content>
-          <ion-list>
+          <ion-row>
+            <ion-col>
+              <div class="infoapp">
+                <ion-list>
+        
+                  <!-- Marca del vehículo -->
+                  <ion-item>
+                    <ion-label>Marca:</ion-label>
+                    <ion-text>{{ vehiculo?.marca }}</ion-text>
+                  </ion-item>
+        
+                  <!-- Modelo del vehículo -->
+                  <ion-item>
+                    <ion-label>Modelo:</ion-label>
+                    <ion-text>{{ vehiculo?.modelo }}</ion-text>
+                  </ion-item>
+        
+                  <!-- Año del vehículo -->
+                  <ion-item>
+                    <ion-label>Año:</ion-label>
+                    <ion-text>{{ vehiculo?.anio }}</ion-text>
+                  </ion-item>
+        
+                  <!-- Patente del vehículo -->
+                  <ion-item>
+                    <ion-label>Patente:</ion-label>
+                    <ion-text>{{ vehiculo?.patente }}</ion-text>
+                  </ion-item>
+        
+                  <!-- Nuevo color -->
+                  <ion-item>
+                    <ion-label>Nuevo Color:</ion-label>
+                    <ion-input 
+                      formControlName="newColor" 
+                      style="text-align: right;"
+                      label-placement="floating" 
+                      fill="undefined" 
+                      placeholder="{{ vehiculo?.color }}">
+                    </ion-input>
+                  </ion-item>
+        
+                  <div id="error" *ngIf="editaFormVehiculo.get('newColor')?.invalid && editaFormVehiculo.get('newColor')?.touched">
+                    Debes ingresar un color válido.
+                  </div>
+        
+                  <!-- Capacidad de asientos -->
+                  <ion-item>
+                    <ion-label>Capacidad Asientos:</ion-label>
+                    <ion-select 
+                      style="text-align: right;" 
+                      formControlName="newAsientos" 
+                      interface="popover" 
+                      placeholder="{{ vehiculo?.asientos }}">
+                      <ion-select-option value="2">2</ion-select-option>
+                      <ion-select-option value="3">3</ion-select-option>
+                      <ion-select-option value="4">4</ion-select-option>
+                      <ion-select-option value="5">5</ion-select-option>
+                    </ion-select>
+                  </ion-item>
 
-            <ion-item>
-              <ion-label>Marca:</ion-label>
-              <ion-text>{{ vehiculo?.marca }}</ion-text>
-            </ion-item>
+                  <div *ngIf="editaFormVehiculo.get('newAsientos')?.invalid && editaFormVehiculo.get('newAsientos')?.touched">
+                    Ingresa asientos del vehículo (2 - 5).
+                  </div>
+                  
+                </ion-list>
+              </div>
+            </ion-col>
+          </ion-row>
 
-            <ion-item>
-              <ion-label>Modelo:</ion-label>
-              <ion-text>{{ vehiculo?.modelo }}</ion-text>
-            </ion-item>
-
-            <ion-item>
-              <ion-label>Año:</ion-label>
-              <ion-text>{{ vehiculo?.anio }}</ion-text>
-            </ion-item>
-
-            <ion-item>
-              <ion-label>Patente:</ion-label>
-              <ion-text>{{ vehiculo?.patente }}</ion-text>
-            </ion-item>
-
-            <ion-item>
-              <ion-label>Nuevo Color:</ion-label>
-              <ion-input 
-                formControlName="newColor" 
-                style="text-align: right;"
-                label-placement="floating" 
-                fill="undefined" 
-                placeholder="{{ vehiculo?.color }}"></ion-input>
-              <ion-text></ion-text>
-            </ion-item>
-
-            <div *ngIf="editaFormVehiculo.get('newColor')?.invalid && editaFormVehiculo.get('newColor')?.touched">
-              Debes ingresar un color válido.
-            </div>
-
-            <ion-item>
-              <ion-label >Capacidad Asientos:</ion-label>
-              <ion-select style="text-align: right;" formControlName="newAsientos" interface="popover" placeholder="{{ vehiculo?.asientos }}">
-                <ion-label>Selecciona la cantidad de asientos:</ion-label>
-                <ion-select-option value="2">2</ion-select-option>
-                <ion-select-option value="3">3</ion-select-option>
-                <ion-select-option value="4">4</ion-select-option>
-                <ion-select-option value="5">5</ion-select-option>
-                
-              </ion-select>
-              <!-- <ion-input 
-                formControlName="newAsientos"  
-                label-placement="floating" 
-                fill="undefined" 
-                type="number"
-                placeholder="{{ vehiculo?.asientos }}" 
-                style="text-align: right;"
-                min="2"
-                max="5">
-              </ion-input>   -->
-            </ion-item>
-            
-            <div *ngIf="editaFormVehiculo.get('newAsientos')?.invalid && editaFormVehiculo.get('newAsientos')?.touched">
-              Ingresa asientos del vehículo (2 - 5).
-            </div>
-            
-          </ion-list>
-  
+          <!-- Botones -->
           <div class="button-container">
-            <ion-button color="warning" shape="round"  type="submit">Aceptar cambios</ion-button>
-            <ion-button color="secondary" shape="round" [routerLink]="['/tabs/perfil-usuario']" >Volver</ion-button>
+            <ion-button color="warning" shape="round" type="submit">Aceptar cambios</ion-button>
+            <ion-button color="secondary" shape="round" [routerLink]="['/tabs/perfil-usuario']">Volver</ion-button>
           </div>
-          
+
         </ion-card-content>
-      </ion-card>
-    </form>
-  </div>
+      
+      </ion-grid>
+    
+    </ion-card>
+  </form>
 </ion-content>

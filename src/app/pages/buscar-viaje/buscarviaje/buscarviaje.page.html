@@ -17,8 +17,6 @@
       <ion-card-title>Viajes Disponibles</ion-card-title>
     </ion-card-header>
   
-
-  
     <ion-card-content *ngIf="viajes.length > 0; else noViajes">
       <ion-list *ngFor="let viaje of viajes; let i = index">
         <ng-container>
@@ -33,29 +31,23 @@
               <p>Asientos Disponibles: {{ viaje.asientosDisponibles }}</p>
               <p>Precio: {{ viaje.precio | currency }}</p>
             </ion-label>
-  
+    
             <!-- Botón para solicitar viaje -->
             <ion-button 
-              (click)="solicitarViaje(viaje)" 
-              color="warning" 
               *ngIf="viaje.asientosDisponibles > 0 && (!viajeSolicitado || viajeSolicitado !== viaje.destino)"
-              [disabled]="viajeSolicitado && viajeSolicitado !== viaje.destino">
+              (click)="solicitarViaje(viaje)" 
+              color="warning">
               Solicitar Viaje
             </ion-button>
-  
+    
             <!-- Botón para cancelar la solicitud de viaje -->
             <ion-button 
-              *ngIf="viaje.solicitantes?.includes(usuarioAutenticado?.correo) && puedeCancelar(viaje)"
+              *ngIf="viaje.solicitantes?.includes(usuarioAutenticado?.correo)"
               (click)="cancelarSolicitud(viaje)"
               color="danger">
               Cancelar viaje
             </ion-button>
           </ion-item>
-          <!-- <ion-label 
-            id="error" 
-            *ngIf="viaje.solicitantes?.includes(usuarioAutenticado?.correo)">
-            Faltan menos de 30 minutos para la salida, no puedes cancelar el viaje.
-          </ion-label> -->
         </ng-container>
       </ion-list>
     </ion-card-content>

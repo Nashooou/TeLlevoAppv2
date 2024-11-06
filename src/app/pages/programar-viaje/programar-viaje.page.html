@@ -42,6 +42,7 @@
         </ion-item>
         <div id="error" *ngIf="programarForm.get('hora')?.invalid && programarForm.get('hora')?.touched">
           <p *ngIf="programarForm.get('hora')?.errors?.['required']">La hora es requerida.</p>
+          <p *ngIf="programarForm.get('hora')?.errors?.['horaInvalida']">La hora de salida debe ser programada con un mínimo de 20 minutos.</p>
         </div>
   
   
@@ -69,7 +70,7 @@
         </ion-item>
         <div id="error"  *ngIf="programarForm.get('precio')?.invalid && programarForm.get('precio')?.touched">
           <p *ngIf="programarForm.get('precio')?.errors?.['required']">El precio es requerido.</p>
-          <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio no puede ser negativo.</p>
+          <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio de viaje debe ser mayor a 0.</p>
         </div>
   
         
