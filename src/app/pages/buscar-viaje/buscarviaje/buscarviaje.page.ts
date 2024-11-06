@@ -26,6 +26,11 @@ export class BuscarviajePage implements OnInit {
 
   viajes: any[] = []; // Aquí almacenaremos la información de los viajes
   nombreConductor: string='';
+  usuarioAutenticado: any;
+  viajeSolicitado: string | null = null; // Almacena el ID del viaje solicitado
+  horaActualChile: string = '';
+  
+
 
   constructor(
     private viajeService : ViajeService,
@@ -37,39 +42,107 @@ export class BuscarviajePage implements OnInit {
     
   }
 
+
+
   ionViewWillEnter() {
     this.ngOnInit(); // Recarga los datos del mapa y los viajes
   }
   
 
+
+
   async ngOnInit() {
-    // Obtener usuarios desde el servicio y el usuario autenticado
+    
+    this.actualizarHoraChile();
+
     const usuarios = await this.usuarioService.obtenerUsuarios();
-    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
-  
-    if (!usuarioAutenticado) {
+    this.usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+
+    
+
+    if (!this.usuarioAutenticado) {
       console.log('No se pudo obtener el usuario autenticado');
       return;
     }
-  
-    
 
-    // Obtener los viajes y filtrar los que no pertenecen al usuario autenticado
     const todosLosViajes = await this.viajeService.obtenerViajes() || [];
-    this.viajes = todosLosViajes.filter((viaje: Viaje) => viaje.userViaje !== usuarioAutenticado.correo);
-    
-    
-  
-    // Dibuja mapas y rutas para cada viaje restante
+    this.viajes = todosLosViajes.filter((viaje: Viaje) => viaje.userViaje !== this.usuarioAutenticado.correo);
+
+    this.viajes.forEach(viaje => {
+      if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+        this.viajeSolicitado = viaje.destino;
+      }
+    });
+
     setTimeout(() => {
       this.viajes.forEach((viaje, index) => {
-        const mapa = this.dibujarMapa(viaje, index); // Llama a dibujarMapa y obtiene el mapa
-        this.calcularRuta(viaje, mapa); // Pasa el mapa a calcularRuta
-        
+        const mapa = this.dibujarMapa(viaje, index);
+        this.calcularRuta(viaje, mapa);
       });
     }, 0);
   }
+
+
+
   
+
+  obtenerHoraActualChile(): string {
+    const fechaChile = new Date();
+    const options = {
+      timeZone: 'America/Santiago',
+      hour12: false,
+      hour: '2-digit' as 'numeric',
+      minute: '2-digit' as 'numeric',
+      second: '2-digit' as 'numeric'
+    };
+    return fechaChile.toLocaleTimeString('en-US', options); // Devuelve la hora en formato 24 horas
+  }
+
+
+
+
+
+  convertirHoraViaje(viajeHora: string): Date {
+    const [hora, minuto, segundo] = viajeHora.split(':');
+    const ahora = new Date();
+    // Creamos una nueva fecha con la hora y minuto del viaje
+    const fechaViaje = new Date(ahora.setHours(Number(hora), Number(minuto), Number(segundo), 0));
+    
+    return fechaViaje;
+  }
+
+
+
+
+
+  // Método para verificar si el viaje se puede cancelar
+  puedeCancelar(viaje: any): boolean {
+    
+    const horaActual = new Date();
+  
+    // Hora de salida del viaje (convertirla a objeto Date)
+    const [hora, minutos] = viaje.hora.split(':');
+    
+    // Crear una fecha con la hora actual, pero usando la hora del viaje
+    const horaSalida = new Date(horaActual);
+    horaSalida.setHours(Number(hora), Number(minutos), 0, 0); // Establecer la hora de salida en la fecha actual
+    
+    // Verificar si la hora de salida es en el día siguiente (si la hora está cerca de medianoche)
+    if (horaActual.getHours() > 22 && Number(hora) < 6) {
+      // Si la hora actual es después de las 22:00 y la hora de salida es en la madrugada,
+      // entonces la hora de salida está en el día siguiente, así que ajustamos la fecha
+      horaSalida.setDate(horaSalida.getDate() + 1); // Sumamos un día para ajustarla al día siguiente
+    }
+  
+    // Calcular la diferencia en minutos
+    const diferenciaMinutos = (horaSalida.getTime() - horaActual.getTime()) / (1000 * 60);
+  
+    // Si la diferencia es mayor a 30 minutos, se puede cancelar
+    return diferenciaMinutos > 30;
+  }
+
+
+
 
   dibujarMapa(viaje: any, index: number) {
     const mapElement = document.getElementById(`map${index}`);
@@ -99,6 +172,10 @@ export class BuscarviajePage implements OnInit {
     }
   }
 
+
+
+
+
   calcularRuta(viaje: any, mapa: any) {
     const origen = viaje.origen; // Asegúrate de que 'origen' tenga las coordenadas
     const destino = viaje.destinoCoordenadas;
@@ -123,18 +200,12 @@ export class BuscarviajePage implements OnInit {
   }
 
 
+
+
+
   
   async solicitarViaje(viaje: Viaje) {
-    const usuarios = await this.usuarioService.obtenerUsuarios();
-    const usuarioAutenticado = usuarios.find((usuario) => usuario.autenticado === true);
-  
-    if (!usuarioAutenticado) {
-      console.log('No se pudo obtener el usuario autenticado');
-      return;
-    }
-  
-    // Evitar que el usuario solicite su propio viaje
-    if (viaje.userViaje === usuarioAutenticado.correo) {
+    if (viaje.userViaje === this.usuarioAutenticado.correo) {
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'No puedes solicitar tu propio viaje.',
@@ -144,8 +215,7 @@ export class BuscarviajePage implements OnInit {
       return;
     }
   
-    // Verificar si el usuario ya solicitó el viaje
-    if (viaje.solicitantes?.includes(usuarioAutenticado.correo)) {
+    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'Ya solicitaste este viaje.',
@@ -153,10 +223,8 @@ export class BuscarviajePage implements OnInit {
       });
       await alert.present();
       return;
-      
     }
   
-    // Verificar si hay asientos disponibles
     if (viaje.asientosDisponibles <= 0) {
       const alert = await this.alertController.create({
         header: 'Error',
@@ -167,15 +235,14 @@ export class BuscarviajePage implements OnInit {
       return;
     }
   
-    // Actualizar el viaje con el correo del solicitante y descontar un asiento
     viaje.asientosDisponibles--;
-    if (!viaje.solicitantes) viaje.solicitantes = []; // Inicializar la lista si está indefinida
-    viaje.solicitantes.push(usuarioAutenticado.correo);
+    viaje.solicitantes = viaje.solicitantes || [];
+    viaje.solicitantes.push(this.usuarioAutenticado.correo);
   
-    // Guardar los cambios en el almacenamiento
+    // Aquí actualizamos los viajes y recalculamos los botones habilitados/deshabilitados
     await this.viajeService.guardarListaViajes(this.viajes);
+    this.viajeSolicitado = viaje.destino;
   
-    // Mostrar confirmación al usuario
     const toast = await this.toastController.create({
       message: 'Solicitud realizada exitosamente',
       duration: 2000,
@@ -183,12 +250,55 @@ export class BuscarviajePage implements OnInit {
       position: 'bottom'
     });
     await toast.present();
-
-    this.router.navigate(['/tabs/inicio']);
+    
+    this.ngOnInit();
   }
 
-  irInicio(){
-    this.router.navigate(['/tabs/inicio']);
+
+
+
+
+
+
+  async cancelarSolicitud(viaje: Viaje) {
+
+    if (!this.puedeCancelar(viaje)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No puedes cancelar el viaje cuando faltan menos de 30 minutos.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+
+    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+      viaje.solicitantes = viaje.solicitantes.filter(
+        (correo) => correo !== this.usuarioAutenticado.correo
+      );
+      viaje.asientosDisponibles++;
+
+      await this.viajeService.guardarListaViajes(this.viajes);
+
+      this.viajeSolicitado = null;
+
+      const toast = await this.toastController.create({
+        message: 'Solicitud cancelada exitosamente',
+        duration: 2000,
+        color: 'danger',
+        position: 'bottom'
+      });
+      await toast.present();
+    }
   }
 
+  actualizarHoraChile() {
+    this.horaActualChile = this.obtenerHoraActualChile();
+    console.log('Hora actual de Chile:', this.horaActualChile); // Esto es solo para verificar en consola
+  }
+
+  irInicio() {
+    this.router.navigate(['/tabs/inicio']);
+  }
 }

@@ -33,6 +33,7 @@
               <p>Asientos Disponibles: {{ viaje.asientosDisponibles }}</p>
               <p>Precio: {{ viaje.precio | currency }}</p>
             </ion-label>
+            <ion-button color="danger" (click)="cancelarViaje(viaje)">Cancelar Viaje</ion-button>
           </ion-item>
         </ng-container>
       </ion-list>

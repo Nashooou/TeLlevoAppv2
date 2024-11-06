@@ -32,4 +32,9 @@ export class TabsPage implements OnInit {
   irInicio(){
     this.router.navigate(['/tabs/inicio']);
   }
+
+  irViajeProgramado() {
+    window.location.href = '/tabs/ver-viaje-detalle';
+  }
+
 }

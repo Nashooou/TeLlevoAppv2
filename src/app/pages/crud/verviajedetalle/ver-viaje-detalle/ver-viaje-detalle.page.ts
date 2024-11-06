@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, ToastController } from '@ionic/angular/standalone';
 import { IonicModule } from '@ionic/angular';
 import { ViajeService, Viaje } from 'src/app/services/ViajeService/viaje.service';
 import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
@@ -28,7 +28,8 @@ export class VerViajeDetallePage implements OnInit {
   constructor(
     private viajeService : ViajeService,
     private usuarioService:UsuarioService,
-    private router : Router
+    private router : Router,
+    private toastController: ToastController
   ) { 
 
   }
@@ -116,5 +117,38 @@ export class VerViajeDetallePage implements OnInit {
     });
   }
 
+  async cancelarViaje(viaje: Viaje) {
+    // Obtener el usuario autenticado
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+    
+    if (!usuarioAutenticado || viaje.userViaje !== usuarioAutenticado.correo) {
+      console.error('No tienes permisos para cancelar este viaje.');
+      return;
+    }
+
+    // Obtener todos los viajes del storage
+    const todosLosViajes = await this.viajeService.obtenerViajes();
+    
+    // Filtrar viajes, excluyendo solo el viaje específico del usuario autenticado
+    const viajesActualizados = todosLosViajes.filter(v => !(v.userViaje === usuarioAutenticado.correo && v.destino === viaje.destino));
+
+    // Guardar la lista actualizada de viajes en el storage
+    await this.viajeService.guardarListaViajes(viajesActualizados);
+
+    // Actualizar la lista local de viajes para reflejar los cambios en la interfaz
+    this.viajes = viajesActualizados.filter(v => v.userViaje === usuarioAutenticado.correo);
+
+    
+    // Mostrar una confirmación de cancelación
+    const toast = await this.toastController.create({
+      message: 'Viaje cancelado exitosamente',
+      duration: 2000,
+      color: 'danger',
+      position: 'bottom'
+    });
+    await toast.present();
+    this.router.navigate(['/tabs/inicio']);
+  }
 
 }

@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-item style="--background: transparent;">
-      <ion-title style="color: white;"><h2>Inicio</h2></ion-title>
+      <ion-title style="color: white;"><h3>Inicio</h3></ion-title>
       <ion-icon name="person" color="light" size="large"></ion-icon>
     </ion-item>
     
@@ -18,9 +18,17 @@
       <ion-card-title><h1>Bienvenido, {{ par_nombre }}</h1></ion-card-title>
       <!-- <ion-card-subtitle>Card Subtitle</ion-card-subtitle> -->
     </ion-card-header>
-  
-    
   </ion-card>
+
+  <ion-card color="tertiary">
+    <ion-card-header>
+      <ion-card-title><h2>Hora Actual</h2></ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <h3>{{ horaActualChile }}</h3> <!-- Aquí mostramos la hora -->
+    </ion-card-content>
+  </ion-card>
+
 
   <ion-card color="secondary">
     <ion-card-header>
@@ -29,15 +37,14 @@
     </ion-card-header>
   
     <ion-card-content> 
-      
       <ion-button color="warning" shape="round" (click)="irBuscarViaje()"><h2>Buscar Viajes Disponibles</h2></ion-button>
     
       <ion-label *ngIf="showAvisoVehiculo"><h3>Para ser Conductor necesitas registrar un vehículo primero.</h3></ion-label>
-      <ion-button color="success" *ngIf="showAvisoVehiculo" [routerLink]="['/tabs/registravehiculo']"><h2>Registrar Vehículo</h2></ion-button>
+      <ion-button color="success" *ngIf="showAvisoVehiculo" shape="round" [routerLink]="['/tabs/registravehiculo']"><h2>Registrar Vehículo</h2></ion-button>
 
       <ion-button color="warning" *ngIf="showBtnProgramar" shape="round" [routerLink]="['/tabs/programar-viaje']"><h2>Programar Viaje</h2></ion-button>
       
-      <ion-button color="warning" *ngIf="showBtnVerViaje" shape="round" (click)="irViajeProgramado()"><h2>Ver Viaje Programado</h2></ion-button>
+      <!-- <ion-button color="warning" *ngIf="showBtnVerViaje" shape="round" (click)="irViajeProgramado()"><h2>Ver Viaje Programado</h2></ion-button> -->
     </ion-card-content>
   </ion-card>
   

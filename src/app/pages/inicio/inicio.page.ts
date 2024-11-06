@@ -23,7 +23,8 @@ export class InicioPage implements OnInit {
   showAvisoVehiculo:boolean=true;
   showBtnVerViaje:boolean=false;
   viajes: any[] = [];
-
+  horaActualChile: string = '';
+  private intervalo: any;
 
   constructor(
     private router: Router,
@@ -44,7 +45,12 @@ export class InicioPage implements OnInit {
 
   }
 
+  
   async ngOnInit() {
+    
+    this.actualizarHoraChile();
+    this.intervalo = setInterval(() => this.actualizarHoraChile(), 1000);
+
     // Obtener usuarios desde el servicio
     const usuarios = await this.usuarioService.obtenerUsuarios();
     
@@ -86,6 +92,31 @@ export class InicioPage implements OnInit {
     }
 
   }
+
+  ngOnDestroy() {
+    if (this.intervalo) {
+      clearInterval(this.intervalo); // Limpiar intervalo cuando se destruye el componente
+    }
+  }
+
+  obtenerHoraActualChile(): string {
+    const fechaChile = new Date(); // Obtenemos la hora local
+    // Establecemos la zona horaria de Chile y la convertimos a formato HH:mm:ss
+    const options = { 
+      timeZone: 'America/Santiago', 
+      hour12: false, 
+      hour: '2-digit' as 'numeric',  // Asegúrate de usar '2-digit' o 'numeric'
+      minute: '2-digit' as 'numeric', 
+      second: '2-digit' as 'numeric' 
+    };
+    return fechaChile.toLocaleTimeString('en-US', options); // La hora se muestra en formato 24 horas
+  }
+
+  actualizarHoraChile() {
+    this.horaActualChile = this.obtenerHoraActualChile();
+  }
+  
+
 
   irBuscarViaje() {
     window.location.href = '/tabs/buscarviaje';

@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-item style="--background: transparent;">
-      <ion-title style="color: white;"><h2>Búsqueda de Viajes</h2></ion-title>
+      <ion-title style="color: white;"><h3>Búsqueda de Viaje</h3></ion-title>
       <ion-icon name="person" color="light" size="large"></ion-icon>
     </ion-item>
     
@@ -16,31 +16,46 @@
     <ion-card-header>
       <ion-card-title>Viajes Disponibles</ion-card-title>
     </ion-card-header>
-  </ion-card>
+  
 
-  <ion-card>
+  
     <ion-card-content *ngIf="viajes.length > 0; else noViajes">
-      <ion-list>
-        <ng-container *ngFor="let viaje of viajes; let i = index">
+      <ion-list *ngFor="let viaje of viajes; let i = index">
+        <ng-container>
           <ion-label>Conductor: {{ viaje.userViaje }}</ion-label>
           <div class="map-container">
             <div id="map{{i}}" style="width: 100%; height: 200px;"></div>
           </div>
           <ion-item>
-            
             <ion-label>
               <h2>Destino: {{ viaje.destino }}</h2>
               <p>Hora de Salida: {{ viaje.hora }}</p>
               <p>Asientos Disponibles: {{ viaje.asientosDisponibles }}</p>
               <p>Precio: {{ viaje.precio | currency }}</p>
             </ion-label>
+  
+            <!-- Botón para solicitar viaje -->
             <ion-button 
-            (click)="solicitarViaje(viaje)" 
-            color="warning" 
-            *ngIf="viaje.asientosDisponibles > 0">
-            Solicitar Viaje
-          </ion-button>
+              (click)="solicitarViaje(viaje)" 
+              color="warning" 
+              *ngIf="viaje.asientosDisponibles > 0 && (!viajeSolicitado || viajeSolicitado !== viaje.destino)"
+              [disabled]="viajeSolicitado && viajeSolicitado !== viaje.destino">
+              Solicitar Viaje
+            </ion-button>
+  
+            <!-- Botón para cancelar la solicitud de viaje -->
+            <ion-button 
+              *ngIf="viaje.solicitantes?.includes(usuarioAutenticado?.correo) && puedeCancelar(viaje)"
+              (click)="cancelarSolicitud(viaje)"
+              color="danger">
+              Cancelar viaje
+            </ion-button>
           </ion-item>
+          <!-- <ion-label 
+            id="error" 
+            *ngIf="viaje.solicitantes?.includes(usuarioAutenticado?.correo)">
+            Faltan menos de 30 minutos para la salida, no puedes cancelar el viaje.
+          </ion-label> -->
         </ng-container>
       </ion-list>
     </ion-card-content>
