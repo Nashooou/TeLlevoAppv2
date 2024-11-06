@@ -34,7 +34,7 @@
     
             <!-- Botón para solicitar viaje -->
             <ion-button 
-              *ngIf="viaje.asientosDisponibles > 0 && (!viajeSolicitado || viajeSolicitado !== viaje.destino)"
+              *ngIf="viaje.asientosDisponibles > 0 && !isViajeSolicitado(viaje)"
               (click)="solicitarViaje(viaje)" 
               color="warning">
               Solicitar Viaje
@@ -42,7 +42,7 @@
     
             <!-- Botón para cancelar la solicitud de viaje -->
             <ion-button 
-              *ngIf="viaje.solicitantes?.includes(usuarioAutenticado?.correo)"
+              *ngIf="isViajeSolicitado(viaje)"
               (click)="cancelarSolicitud(viaje)"
               color="danger">
               Cancelar viaje

@@ -27,7 +27,7 @@ export class BuscarviajePage implements OnInit {
   viajes: any[] = []; // Aquí almacenaremos la información de los viajes
   nombreConductor: string='';
   usuarioAutenticado: any;
-  viajeSolicitado: string | null = null; // Almacena el ID del viaje solicitado
+  viajeSolicitado: { [key: string]: boolean } = {};
   horaActualChile: string = '';
   
 
@@ -44,43 +44,191 @@ export class BuscarviajePage implements OnInit {
 
 
 
-  ionViewWillEnter() {
-    this.ngOnInit(); // Recarga los datos del mapa y los viajes
+  async ngOnInit() {
+    this.cargarDatosViajes(); // Recarga los datos del mapa y los viajes
   }
   
 
 
-
-  async ngOnInit() {
-    
-    this.actualizarHoraChile();
-
+  // Cargar la lista de viajes y el estado de los viajes solicitados
+  async cargarDatosViajes() {
     const usuarios = await this.usuarioService.obtenerUsuarios();
-    this.usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
-
-    
+    this.usuarioAutenticado = usuarios.find(usuario => usuario.autenticado === true);
 
     if (!this.usuarioAutenticado) {
       console.log('No se pudo obtener el usuario autenticado');
       return;
     }
 
-    const todosLosViajes = await this.viajeService.obtenerViajes() || [];
-    this.viajes = todosLosViajes.filter((viaje: Viaje) => viaje.userViaje !== this.usuarioAutenticado.correo);
+    const todosLosViajes = await this.viajeService.obtenerViajes();
+    this.viajes = todosLosViajes.filter(viaje => viaje.userViaje !== this.usuarioAutenticado.correo);
 
+    // Verificar los viajes solicitados por el usuario
     this.viajes.forEach(viaje => {
-      if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
-        this.viajeSolicitado = viaje.destino;
-      }
+      this.viajeSolicitado[viaje.destino] = viaje.solicitantes?.includes(this.usuarioAutenticado.correo) ?? false;
     });
 
     setTimeout(() => {
-      this.viajes.forEach((viaje, index) => {
-        const mapa = this.dibujarMapa(viaje, index);
-        this.calcularRuta(viaje, mapa);
-      });
-    }, 0);
+          this.viajes.forEach((viaje, index) => {
+            const mapa = this.dibujarMapa(viaje, index);
+            this.calcularRuta(viaje, mapa);
+          });
+        }, 0);
   }
+
+
+  // Verificar si el viaje ya ha sido solicitado
+  isViajeSolicitado(viaje: Viaje): boolean {
+    return this.viajeSolicitado[viaje.destino] || false;
+  }
+
+
+  // Método para verificar si el viaje se puede cancelar (menos de 30 minutos antes de la salida)
+  puedeCancelar(viaje: any): boolean {
+    const horaActual = new Date();
+  
+    // Hora de salida del viaje (convertirla a objeto Date)
+    const [hora, minutos] = viaje.hora.split(':');
+    
+    // Crear una fecha con la hora actual, pero usando la hora del viaje
+    const horaSalida = new Date(horaActual);
+    horaSalida.setHours(Number(hora), Number(minutos), 0, 0); // Establecer la hora de salida en la fecha actual
+    
+    // Verificar si la hora de salida es en el día siguiente (si la hora está cerca de medianoche)
+    if (horaActual.getHours() > 22 && Number(hora) < 6) {
+      // Si la hora actual es después de las 22:00 y la hora de salida es en la madrugada,
+      // entonces la hora de salida está en el día siguiente, así que ajustamos la fecha
+      horaSalida.setDate(horaSalida.getDate() + 1); // Sumamos un día para ajustarla al día siguiente
+    }
+  
+    // Calcular la diferencia en minutos
+    const diferenciaMinutos = (horaSalida.getTime() - horaActual.getTime()) / (1000 * 60);
+  
+    // Si la diferencia es mayor a 30 minutos, se puede cancelar
+    return diferenciaMinutos > 30;
+  }
+
+
+  async solicitarViaje(viaje: Viaje) {
+    if (viaje.userViaje === this.usuarioAutenticado.correo) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No puedes solicitar tu propio viaje.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ya solicitaste este viaje.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+    if (viaje.asientosDisponibles <= 0) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ya no quedan asientos disponibles.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+    viaje.asientosDisponibles--;
+    viaje.solicitantes = viaje.solicitantes || [];
+    viaje.solicitantes.push(this.usuarioAutenticado.correo);
+
+    // Actualizar el estado del viaje solicitado
+    this.viajeSolicitado[viaje.destino] = true;
+    await this.viajeService.guardarListaViajes(this.viajes);
+
+    const toast = await this.toastController.create({
+      message: 'Solicitud realizada exitosamente',
+      duration: 2000,
+      color: 'success',
+      position: 'bottom'
+    });
+    await toast.present();
+  }
+
+
+  async cancelarSolicitud(viaje: Viaje) {
+    // Verificar si el viaje puede ser cancelado
+    if (!this.puedeCancelar(viaje)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No puedes cancelar el viaje cuando faltan menos de 30 minutos.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+  
+    // Si el usuario está en la lista de solicitantes, lo eliminamos
+    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+      viaje.solicitantes = viaje.solicitantes.filter(correo => correo !== this.usuarioAutenticado.correo);
+      viaje.asientosDisponibles++;  // Liberar un asiento
+
+      // Actualizar el estado del viaje solicitado
+      this.viajeSolicitado[viaje.destino] = false;
+      await this.viajeService.guardarListaViajes(this.viajes);
+
+      const toast = await this.toastController.create({
+        message: 'Solicitud cancelada exitosamente',
+        duration: 2000,
+        color: 'danger',
+        position: 'bottom'
+      });
+      await toast.present();
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+  // async ngOnInit() {
+    
+  //   this.actualizarHoraChile();
+
+  //   const usuarios = await this.usuarioService.obtenerUsuarios();
+  //   this.usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+
+    
+
+  //   if (!this.usuarioAutenticado) {
+  //     console.log('No se pudo obtener el usuario autenticado');
+  //     return;
+  //   }
+
+  //   const todosLosViajes = await this.viajeService.obtenerViajes() || [];
+  //   this.viajes = todosLosViajes.filter((viaje: Viaje) => viaje.userViaje !== this.usuarioAutenticado.correo);
+
+  //   this.viajes.forEach(viaje => {
+  //     if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+  //       this.viajeSolicitado = viaje.destino;
+  //     }
+  //   });
+
+  //   setTimeout(() => {
+  //     this.viajes.forEach((viaje, index) => {
+  //       const mapa = this.dibujarMapa(viaje, index);
+  //       this.calcularRuta(viaje, mapa);
+  //     });
+  //   }, 0);
+  // }
 
 
 
@@ -115,31 +263,31 @@ export class BuscarviajePage implements OnInit {
 
 
 
-  // Método para verificar si el viaje se puede cancelar
-  puedeCancelar(viaje: any): boolean {
+  // // Método para verificar si el viaje se puede cancelar
+  // puedeCancelar(viaje: any): boolean {
     
-    const horaActual = new Date();
+  //   const horaActual = new Date();
   
-    // Hora de salida del viaje (convertirla a objeto Date)
-    const [hora, minutos] = viaje.hora.split(':');
+  //   // Hora de salida del viaje (convertirla a objeto Date)
+  //   const [hora, minutos] = viaje.hora.split(':');
     
-    // Crear una fecha con la hora actual, pero usando la hora del viaje
-    const horaSalida = new Date(horaActual);
-    horaSalida.setHours(Number(hora), Number(minutos), 0, 0); // Establecer la hora de salida en la fecha actual
+  //   // Crear una fecha con la hora actual, pero usando la hora del viaje
+  //   const horaSalida = new Date(horaActual);
+  //   horaSalida.setHours(Number(hora), Number(minutos), 0, 0); // Establecer la hora de salida en la fecha actual
     
-    // Verificar si la hora de salida es en el día siguiente (si la hora está cerca de medianoche)
-    if (horaActual.getHours() > 22 && Number(hora) < 6) {
-      // Si la hora actual es después de las 22:00 y la hora de salida es en la madrugada,
-      // entonces la hora de salida está en el día siguiente, así que ajustamos la fecha
-      horaSalida.setDate(horaSalida.getDate() + 1); // Sumamos un día para ajustarla al día siguiente
-    }
+  //   // Verificar si la hora de salida es en el día siguiente (si la hora está cerca de medianoche)
+  //   if (horaActual.getHours() > 22 && Number(hora) < 6) {
+  //     // Si la hora actual es después de las 22:00 y la hora de salida es en la madrugada,
+  //     // entonces la hora de salida está en el día siguiente, así que ajustamos la fecha
+  //     horaSalida.setDate(horaSalida.getDate() + 1); // Sumamos un día para ajustarla al día siguiente
+  //   }
   
-    // Calcular la diferencia en minutos
-    const diferenciaMinutos = (horaSalida.getTime() - horaActual.getTime()) / (1000 * 60);
+  //   // Calcular la diferencia en minutos
+  //   const diferenciaMinutos = (horaSalida.getTime() - horaActual.getTime()) / (1000 * 60);
   
-    // Si la diferencia es mayor a 30 minutos, se puede cancelar
-    return diferenciaMinutos > 30;
-  }
+  //   // Si la diferencia es mayor a 30 minutos, se puede cancelar
+  //   return diferenciaMinutos > 30;
+  // }
 
 
 
@@ -204,55 +352,55 @@ export class BuscarviajePage implements OnInit {
 
 
   
-  async solicitarViaje(viaje: Viaje) {
-    if (viaje.userViaje === this.usuarioAutenticado.correo) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No puedes solicitar tu propio viaje.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
+  // async solicitarViaje(viaje: Viaje) {
+  //   if (viaje.userViaje === this.usuarioAutenticado.correo) {
+  //     const alert = await this.alertController.create({
+  //       header: 'Error',
+  //       message: 'No puedes solicitar tu propio viaje.',
+  //       buttons: ['Aceptar'],
+  //     });
+  //     await alert.present();
+  //     return;
+  //   }
   
-    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Ya solicitaste este viaje.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
+  //   if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+  //     const alert = await this.alertController.create({
+  //       header: 'Error',
+  //       message: 'Ya solicitaste este viaje.',
+  //       buttons: ['Aceptar'],
+  //     });
+  //     await alert.present();
+  //     return;
+  //   }
   
-    if (viaje.asientosDisponibles <= 0) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Ya no quedan asientos disponibles.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
+  //   if (viaje.asientosDisponibles <= 0) {
+  //     const alert = await this.alertController.create({
+  //       header: 'Error',
+  //       message: 'Ya no quedan asientos disponibles.',
+  //       buttons: ['Aceptar'],
+  //     });
+  //     await alert.present();
+  //     return;
+  //   }
   
-    viaje.asientosDisponibles--;
-    viaje.solicitantes = viaje.solicitantes || [];
-    viaje.solicitantes.push(this.usuarioAutenticado.correo);
+  //   viaje.asientosDisponibles--;
+  //   viaje.solicitantes = viaje.solicitantes || [];
+  //   viaje.solicitantes.push(this.usuarioAutenticado.correo);
   
-    // Aquí actualizamos los viajes y recalculamos los botones habilitados/deshabilitados
-    await this.viajeService.guardarListaViajes(this.viajes);
-    this.viajeSolicitado = viaje.destino;
+  //   // Aquí actualizamos los viajes y recalculamos los botones habilitados/deshabilitados
+  //   await this.viajeService.guardarListaViajes(this.viajes);
+  //   this.viajeSolicitado = viaje.destino;
   
-    const toast = await this.toastController.create({
-      message: 'Solicitud realizada exitosamente',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+  //   const toast = await this.toastController.create({
+  //     message: 'Solicitud realizada exitosamente',
+  //     duration: 2000,
+  //     color: 'success',
+  //     position: 'bottom'
+  //   });
+  //   await toast.present();
     
-    this.ngOnInit();
-  }
+  //   this.ngOnInit();
+  // }
 
 
  
@@ -260,40 +408,40 @@ export class BuscarviajePage implements OnInit {
 
 
 
-  async cancelarSolicitud(viaje: Viaje) {
+  // async cancelarSolicitud(viaje: Viaje) {
 
-    if (!this.puedeCancelar(viaje)) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No puedes cancelar el viaje cuando faltan menos de 30 minutos.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
+  //   if (!this.puedeCancelar(viaje)) {
+  //     const alert = await this.alertController.create({
+  //       header: 'Error',
+  //       message: 'No puedes cancelar el viaje cuando faltan menos de 30 minutos.',
+  //       buttons: ['Aceptar'],
+  //     });
+  //     await alert.present();
+  //     return;
+  //   }
   
-    // Si el usuario está en la lista de solicitantes, lo eliminamos
-    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
-      viaje.solicitantes = viaje.solicitantes.filter(
-        (correo) => correo !== this.usuarioAutenticado.correo
-      );
-      viaje.asientosDisponibles++;  // Liberamos un asiento disponible
+  //   // Si el usuario está en la lista de solicitantes, lo eliminamos
+  //   if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+  //     viaje.solicitantes = viaje.solicitantes.filter(
+  //       (correo) => correo !== this.usuarioAutenticado.correo
+  //     );
+  //     viaje.asientosDisponibles++;  // Liberamos un asiento disponible
   
-      // Guardar los cambios
-      await this.viajeService.guardarListaViajes(this.viajes);
+  //     // Guardar los cambios
+  //     await this.viajeService.guardarListaViajes(this.viajes);
   
-      // Restablecer la solicitud realizada
-      this.viajeSolicitado = null;
+  //     // Restablecer la solicitud realizada
+  //     this.viajeSolicitado = null;
   
-      const toast = await this.toastController.create({
-        message: 'Solicitud cancelada exitosamente',
-        duration: 2000,
-        color: 'danger',
-        position: 'bottom'
-      });
-      await toast.present();
-    }
-  }
+  //     const toast = await this.toastController.create({
+  //       message: 'Solicitud cancelada exitosamente',
+  //       duration: 2000,
+  //       color: 'danger',
+  //       position: 'bottom'
+  //     });
+  //     await toast.present();
+  //   }
+  // }
 
   actualizarHoraChile() {
     this.horaActualChile = this.obtenerHoraActualChile();
