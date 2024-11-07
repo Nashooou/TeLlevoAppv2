@@ -56,14 +56,14 @@ export class EditaperfilPage  {
 
   async ngOnInit() {
 
-    // Obtener usuarios desde el servicio
+    
     const usuarios = await this.usuarioService.obtenerUsuarios();
     
-    // Aquí puedes obtener el nombre del último usuario que inició sesión
+    
     const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
     
     if (usuarioAutenticado) {
-      // Asignar el atributo a la variable que mostraremos
+      
       this.usuario = usuarioAutenticado;
     }else{
       console.log("No se pudo obtener el usuario autenticado")
@@ -86,11 +86,10 @@ export class EditaperfilPage  {
   
     const f = this.editaFormAlumno.value;
   
-    // Obtener usuarios desde el servicio
     const usuarios = await this.usuarioService.obtenerUsuarios();
   
     if (usuarios.length === 0) {
-      // Si no hay usuario almacenado
+      
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'No hay datos de usuario almacenados.',
@@ -100,7 +99,7 @@ export class EditaperfilPage  {
       return;
     }
   
-    // Validar si las nuevas contraseñas coinciden
+    
     if (f.password !== f.password2) {
       const alert = await this.alertController.create({
         header: 'Error',
@@ -111,16 +110,15 @@ export class EditaperfilPage  {
       return;
     }
   
-    // Validar la contraseña actual
+    
     if (this.usuario.password === f.currentPassword) {
-      // Actualizar la contraseña del usuario autenticado
+      
       const usuarioIndex = usuarios.findIndex(u => u.correo === this.usuario.correo);
       
       if (usuarioIndex !== -1) {
-        usuarios[usuarioIndex].password = f.password; // Actualizar la contraseña en el array de usuarios
+        usuarios[usuarioIndex].password = f.password; 
   
-        // Usar el servicio para guardar el usuario actualizado
-        await this.usuarioService.actualizarUsuario(usuarios[usuarioIndex]); // Actualiza el usuario en el servicio
+        await this.usuarioService.actualizarUsuario(usuarios[usuarioIndex]); 
       }
   
       const toast = await this.toastController.create({
@@ -130,7 +128,7 @@ export class EditaperfilPage  {
         position: 'bottom'
       });
       await toast.present();
-      // Redirigir a página anterior (descomentar si tienes la ruta configurada)
+      
       this.router.navigate(['/tabs/perfil-usuario']);
   
     } else {

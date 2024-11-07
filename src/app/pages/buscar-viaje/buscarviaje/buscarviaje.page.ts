@@ -24,7 +24,7 @@ declare var google: any;
 })
 export class BuscarviajePage implements OnInit {
 
-  viajes: any[] = []; // Aquí almacenaremos la información de los viajes
+  viajes: any[] = []; 
   nombreConductor: string='';
   usuarioAutenticado: any;
   viajeSolicitado: { [key: string]: boolean } = {};
@@ -50,7 +50,7 @@ export class BuscarviajePage implements OnInit {
   
 
 
-  // Cargar la lista de viajes y el estado de los viajes solicitados
+  
   async cargarDatosViajes() {
     const usuarios = await this.usuarioService.obtenerUsuarios();
     this.usuarioAutenticado = usuarios.find(usuario => usuario.autenticado === true);
@@ -171,7 +171,7 @@ export class BuscarviajePage implements OnInit {
 
 
   async cancelarSolicitud(viaje: Viaje) {
-    // Verificar si el viaje puede ser cancelado
+    
     if (!this.puedeCancelar(viaje)) {
       const alert = await this.alertController.create({
         header: 'Error',
@@ -182,12 +182,12 @@ export class BuscarviajePage implements OnInit {
       return;
     }
   
-    // Si el usuario está en la lista de solicitantes, lo eliminamos
+    
     if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
       viaje.solicitantes = viaje.solicitantes.filter(correo => correo !== this.usuarioAutenticado.correo);
       viaje.asientosDisponibles++;  // Liberar un asiento
 
-      // Actualizar el estado del viaje solicitado
+      
       this.viajeSolicitado[viaje.destino] = false;
       await this.viajeService.guardarListaViajes(this.viajes);
 
@@ -225,7 +225,6 @@ export class BuscarviajePage implements OnInit {
   convertirHoraViaje(viajeHora: string): Date {
     const [hora, minuto, segundo] = viajeHora.split(':');
     const ahora = new Date();
-    // Creamos una nueva fecha con la hora y minuto del viaje
     const fechaViaje = new Date(ahora.setHours(Number(hora), Number(minuto), Number(segundo), 0));
     
     return fechaViaje;
@@ -245,13 +244,13 @@ export class BuscarviajePage implements OnInit {
           zoom: 15,
         });
 
-        // Dibuja el marcador de destino
+        
         new google.maps.Marker({
           position: { lat, lng },
           map: mapa,
         });
 
-        // Calcular y dibujar la ruta
+        
         this.calcularRuta(viaje, mapa);
       } else {
         console.error('Coordenadas inválidas para el viaje:', viaje);
@@ -292,7 +291,7 @@ export class BuscarviajePage implements OnInit {
 
   actualizarHoraChile() {
     this.horaActualChile = this.obtenerHoraActualChile();
-    console.log('Hora actual de Chile:', this.horaActualChile); // Esto es solo para verificar en consola
+    console.log('Hora actual de Chile:', this.horaActualChile); 
   }
 
   irInicio() {

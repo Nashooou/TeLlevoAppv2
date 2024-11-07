@@ -1,8 +1,8 @@
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AnimationController, IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
+import { AlertController, IonicModule,Animation } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { UsuarioService } from '../services/UsuarioService/usuario.service';
 
@@ -27,17 +27,17 @@ export class LoginPage {
   loginForm!: FormGroup;
 
   @ViewChild('logo', {read:ElementRef}) logo?:ElementRef<HTMLImageElement>;
-  @ViewChild('text', {read:ElementRef}) text?:ElementRef<HTMLImageElement>;
   
-  // OUTPUT PERMITE COMPARTIR DATOS DESDE UN COMPONENTE HIJO A UN PADRE POR MEDIO DE EMISIÓN DE EVENTOS
-  // OUTPUT decorador que se usa para emitir eventos desde un componente hijo hacia su componente padre.
-  // @Output() datosAlPadre = new EventEmitter<boolean>();
+  
+  private logoAnimation!:Animation; 
+  
 
   constructor(
     private fb:FormBuilder, 
     private router:Router, 
     private alertController:AlertController,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private animationCtrl:AnimationController
   ) { 
     this.loginForm = this.fb.group({
 
@@ -60,12 +60,35 @@ export class LoginPage {
   } // FIN CONSTRUCTOR
 
 
+  ngAfterViewInit() {
+    if(this.logo?.nativeElement) {
+      this.logoAnimation =this.animationCtrl.create()
+      .addElement(this.logo.nativeElement)
+      .duration(5000)
+      .fromTo('opacity','0','1');
+
+      // this.textAnimation =this.animationCtrl.create()
+      // .addElement(this.text.nativeElement)
+      // .duration(1000)
+      // .fromTo('transform','translateY(20px)', 'translateY(0)');
+
+      this.logoAnimation.play()
+      // this.textAnimation.play()
+
+
+    } // final If
+      else{
+        console.error('Los elementos no fueron encontrados')
+      }
+
+
+  } // final After
 
 
   async onLogin() {
-    //Error si el formulario es inválido
+    
     if (this.loginForm.invalid) {
-      // Si el formulario es inválido, mostrar un mensaje y no hacer nada
+      
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'Por favor, completa todos los campos.',
@@ -75,7 +98,7 @@ export class LoginPage {
       return;
     }
     
-    // Obtener el formulario
+    
     const f = this.loginForm.value;
     const correoMinuscula = this.todoMinuscula(f.correo);
 
@@ -85,7 +108,7 @@ export class LoginPage {
       return;
     }
 
-    // Verificar si el usuario existe por correo
+    
     const existeUsuario = await this.usuarioService.existeUsuario(correoMinuscula); // Solo verificamos el correo
 
     if (!existeUsuario) {
@@ -99,39 +122,36 @@ export class LoginPage {
       return;
     }
     
-    // Validar que el usuario y contraseña coincidan con un usuario
+    
     const validaUsuario = await this.usuarioService.validaUSuario(correoMinuscula, f.password);
 
     if (validaUsuario) {
       
-      // Obtener la lista de usuarios
+      
       const usuarios = await this.usuarioService.obtenerUsuarios();
       const usuario = usuarios.find(u => u.correo === correoMinuscula);
 
       if (usuario) {
-        // Establecer autenticado a true y el resto a false
+        
         usuario.autenticado = true;
   
-        // Asegúrate de que los demás usuarios tengan autenticado en false
+        
         usuarios.forEach(u => {
           if (u.correo !== correoMinuscula) {
             u.autenticado = false;
           }
         });
   
-        // Guardar el usuario actualizado
-        await this.usuarioService.actualizarUsuario(usuario); // Actualiza el usuario específico
+        
+        await this.usuarioService.actualizarUsuario(usuario);
       }
       
-      // Navegar a la página de inicio
+      // Navegar a la página de inicio recargando la vista para que cargue todos los datos de 0
       window.location.href = '/tabs/inicio';
-      // this.router.navigate(['/tabs/inicio']);
       
-      // Emitir el valor true al componente padre
-      // this.datosAlPadre.emit(true);
 
     } else {
-      // Si las credenciales no coinciden
+      
       const alert = await this.alertController.create({
         header: 'Datos Inválidos',
         message: 'Ingresa las credenciales correctas.',
