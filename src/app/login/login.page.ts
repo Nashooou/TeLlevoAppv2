@@ -1,7 +1,7 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AnimationController, IonContent, IonHeader, IonTitle, IonToolbar, NavController } from '@ionic/angular/standalone';
+import { AnimationController } from '@ionic/angular/standalone';
 import { AlertController, IonicModule,Animation } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { UsuarioService } from '../services/UsuarioService/usuario.service';
@@ -27,10 +27,10 @@ export class LoginPage {
   loginForm!: FormGroup;
 
   @ViewChild('logo', {read:ElementRef}) logo?:ElementRef<HTMLImageElement>;
-  
+  @ViewChild('card', {read:ElementRef}) card?:ElementRef<HTMLImageElement>;
   
   private logoAnimation!:Animation; 
-  
+  private cardAnimation!:Animation;
 
   constructor(
     private fb:FormBuilder, 
@@ -59,21 +59,23 @@ export class LoginPage {
     });
   } // FIN CONSTRUCTOR
 
+  
+
 
   ngAfterViewInit() {
-    if(this.logo?.nativeElement) {
+    if(this.logo?.nativeElement && this.card?.nativeElement) {
       this.logoAnimation =this.animationCtrl.create()
       .addElement(this.logo.nativeElement)
       .duration(5000)
       .fromTo('opacity','0','1');
 
-      // this.textAnimation =this.animationCtrl.create()
-      // .addElement(this.text.nativeElement)
-      // .duration(1000)
-      // .fromTo('transform','translateY(20px)', 'translateY(0)');
+      this.cardAnimation =this.animationCtrl.create()
+      .addElement(this.card.nativeElement)
+      .duration(1000)
+      .fromTo('transform','translateY(20px)', 'translateY(0)');
 
       this.logoAnimation.play()
-      // this.textAnimation.play()
+      this.cardAnimation.play()
 
 
     } // final If

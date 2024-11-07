@@ -26,7 +26,7 @@ export class InicioPage implements OnInit {
   horaActualChile: string = '';
   private intervalo: any;
   isAdmin: boolean=false;
-
+  fechaActualChile: string = '';
 
   constructor(
     private router: Router,
@@ -52,7 +52,7 @@ export class InicioPage implements OnInit {
     
     this.actualizarHoraChile();
     this.intervalo = setInterval(() => this.actualizarHoraChile(), 1000);
-
+    this.fechaActualChile = this.obtenerFechaActualChile();
     
 
     // Obtener usuarios desde el servicio
@@ -117,6 +117,22 @@ export class InicioPage implements OnInit {
       second: '2-digit' as 'numeric' 
     };
     return fechaChile.toLocaleTimeString('en-US', options); // La hora se muestra en formato 24 horas
+  }
+
+  obtenerFechaActualChile(): string {
+    const fechaChile = new Date();
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: '2-digit' 
+    };
+  
+    try {
+      return fechaChile.toLocaleDateString('es-CL', options); // Asegúrate de usar el idioma correcto
+    } catch (error) {
+      console.error('Error al formatear la fecha:', error);
+      return ''; // En caso de error, devolver una cadena vacía
+    }
   }
 
   actualizarHoraChile() {

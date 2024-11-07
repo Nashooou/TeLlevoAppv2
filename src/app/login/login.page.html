@@ -16,7 +16,7 @@
 
   <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
     
-    <ion-card>
+    <ion-card #card >
       <ion-card-header>
         <ion-card-title>Inicio de Sesión</ion-card-title>
         <ion-card-subtitle>TeLlevoApp</ion-card-subtitle>
@@ -37,7 +37,7 @@
             type="password" 
             fill="undefined" 
             placeholder="Contraseña" 
-            maxlength="8"></ion-input>  
+            ></ion-input>  
           </ion-item>
         </div>
 
@@ -54,6 +54,7 @@
     </ion-item>
   </form>
 
+  
 </ion-content>
 
 <ion-footer>
