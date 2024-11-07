@@ -9,67 +9,73 @@
 
 
 <ion-content [fullscreen]="true">
-  <div class="recuadro">
+  
     <form [formGroup]="editaFormAlumno" (ngSubmit)="guardarCambios()">
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>Editar Perfil</ion-card-title>
-        </ion-card-header>
-      
-        <ion-card-content>
-          <ion-list>
+        <ion-grid>
+          <ion-card-header>
             <ion-item>
-              <ion-label>Nombre:</ion-label>
-              <ion-text>{{ usuario?.nombre }} {{ usuario?.apellido }}</ion-text>
+              <ion-card-title>Editar Perfil</ion-card-title>
             </ion-item>
-  
-            <!-- <ion-item>
-              <ion-label>Usuario:</ion-label>
-              <ion-text>{{ usuario?.username }}</ion-text>
-            </ion-item> -->
-  
-            <ion-item>
-              <ion-label>Correo Electrónico:</ion-label>
-              <ion-text>{{ usuario?.correo }}</ion-text>
-            </ion-item>
-            
-            
-            <ion-item>
-              <ion-input formControlName="currentPassword" label="Actual Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Actual contraseña"></ion-input>  
-            </ion-item>
-            
-            <div *ngIf="editaFormAlumno.get('currentPassword')?.invalid && editaFormAlumno.get('currentPassword')?.touched">
-              Ingresa una contraseña válida.
-            </div>
-
-            <ion-item>
-              <ion-input formControlName="password" label="Nueva Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Nueva contraseña"></ion-input>  
-            </ion-item>
-            
-            <div *ngIf="editaFormAlumno.get('password')?.invalid && editaFormAlumno.get('password')?.touched">
-              Ingresa una contraseña válida.
-            </div>
-  
-            <ion-item>
-              <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Confirmar contraseña"></ion-input>  
-            </ion-item>
-  
-          </ion-list>
-  
-          <div class="button-container">
-            <ion-button color="warning" shape="round"  type="submit">Aceptar cambios</ion-button>
-            <ion-button color="secondary" shape="round" [routerLink]="['/tabs/perfil-usuario']" >Volver</ion-button>
-          </div>
+          </ion-card-header>
+        
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <div class="infoapp">
+                  <ion-list>
+                    <ion-item>
+                      <ion-label>Nombre:</ion-label>
+                      <ion-text>{{ usuario?.nombre }} {{ usuario?.apellido }}</ion-text>
+                    </ion-item>
           
-        </ion-card-content>
+                   
+                    <ion-item>
+                      <ion-label>Correo Electrónico:</ion-label>
+                      <ion-text>{{ usuario?.correo }}</ion-text>
+                    </ion-item>
+                    
+                    
+                    <ion-item>
+                      <ion-input formControlName="currentPassword" label="Actual Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Actual contraseña"></ion-input>  
+                    </ion-item>
+                    
+                    <div *ngIf="editaFormAlumno.get('currentPassword')?.invalid && editaFormAlumno.get('currentPassword')?.touched">
+                      Ingresa su actual contraseña.
+                    </div>
+  
+                    <ion-item>
+                      <ion-input formControlName="password" label="Nueva Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Nueva contraseña"></ion-input>  
+                    </ion-item>
+                    
+                    <div id="error" *ngIf="editaFormAlumno.get('password')?.invalid && editaFormAlumno.get('password')?.touched">
+                      La contraseña pueden contener <br>
+                      - Entre 5 a 10 carácteres <br>
+                      - minúsculas <br>
+                      - MAYÚSCULAS<br>
+                      - números<br>
+                    </div>
+          
+                    <ion-item>
+                      <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Confirmar contraseña"></ion-input>  
+                    </ion-item>
+          
+                  </ion-list>
+                </div>
+              </ion-col>
+            </ion-row>
+    
+            <div class="button-container">
+              <ion-button color="warning" shape="round"  type="submit">Aceptar cambios</ion-button>
+              <ion-button color="secondary" shape="round" [routerLink]="['/tabs/perfil-usuario']" >Volver</ion-button>
+            </div>
+            
+          </ion-card-content>
+        </ion-grid>
+        
       </ion-card>
     </form>
-  </div>
+  
   
 </ion-content>
 
-<!-- <ion-footer>
-  <ion-toolbar color="primary">
-    <ion-title>Duoc UC - 2024</ion-title>
-  </ion-toolbar>
-</ion-footer> -->

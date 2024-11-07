@@ -100,7 +100,7 @@
           
          
           <ion-item>
-            <ion-select formControlName="asientos" interface="popover" placeholder="Total Asientos">
+            <ion-select formControlName="asientos" interface="popover" placeholder="Capacidad total de pasajeros">
               <ion-label>Selecciona la cantidad de asientos:</ion-label>
               <ion-select-option value="2">2</ion-select-option>
               <ion-select-option value="3">3</ion-select-option>
@@ -118,11 +118,6 @@
 
         </div>
 
-        <div id="error" *ngIf="(registraVehiculoForm.invalid)">
-          <p>
-            Recuerda ingresar todos los datos solicitados
-          </p>
-        </div>
         
         <ion-button id="open-toast" color="warning" shape="round" expand="block" type="submit">Agregar vehículo</ion-button>
         <ion-button color="secondary" shape="round" [routerLink]="['/tabs/perfil-usuario']" expand="block">Volver</ion-button>

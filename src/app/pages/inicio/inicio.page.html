@@ -44,7 +44,7 @@
 
       <ion-button color="warning" *ngIf="showBtnProgramar" shape="round" [routerLink]="['/tabs/programar-viaje']"><h2>Programar Viaje</h2></ion-button>
       
-      <!-- <ion-button color="warning" *ngIf="showBtnVerViaje" shape="round" (click)="irViajeProgramado()"><h2>Ver Viaje Programado</h2></ion-button> -->
+      <ion-label color="warning" *ngIf="showBtnVerViaje">Para ver tus viajes debes ir a la opción "Mis Viajes"</ion-label>
     </ion-card-content>
   </ion-card>
   

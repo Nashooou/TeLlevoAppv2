@@ -24,7 +24,7 @@
             <ion-input formControlName="nombre" label="Nombre" label-placement="floating" fill="undefined" placeholder="Nombre"></ion-input>
           </ion-item>
           
-          <div *ngIf="registraForm.get('nombre')?.invalid && registraForm.get('nombre')?.touched">
+          <div id="error" *ngIf="registraForm.get('nombre')?.invalid && registraForm.get('nombre')?.touched">
             Ingresa un nombre válido.
           </div>
 
@@ -32,23 +32,15 @@
             <ion-input formControlName="apellido" label="Apellido" label-placement="floating" fill="undefined" placeholder="Apellido"></ion-input>
           </ion-item>
 
-          <div *ngIf="registraForm.get('apellido')?.invalid && registraForm.get('apellido')?.touched">
+          <div id="error" *ngIf="registraForm.get('apellido')?.invalid && registraForm.get('apellido')?.touched">
             Ingresa un apellido válido.
           </div>
 
-          <!-- <ion-item>
-            <ion-input formControlName="username" label="Usuario" label-placement="floating" fill="undefined" placeholder="Usuario"></ion-input>
-          </ion-item>
-          
-          <div *ngIf="registraForm.get('username')?.invalid && registraForm.get('username')?.touched">
-            Ingresa un nombre de usuario válido.
-          </div> -->
-
           <ion-item>
-            <ion-input formControlName="correo" label="Correo Electrónico" label-placement="floating" fill="undefined" placeholder="Correo"></ion-input>
+            <ion-input formControlName="correo" label="Correo Electrónico Duoc" label-placement="floating" fill="undefined" placeholder="Correo"></ion-input>
           </ion-item>
           
-          <div *ngIf="registraForm.get('correo')?.invalid && registraForm.get('correo')?.touched">
+          <div id="error" *ngIf="registraForm.get('correo')?.invalid && registraForm.get('correo')?.touched">
             Debes ingresar tu correo institucional.
           </div>
 
@@ -56,31 +48,36 @@
             <ion-input formControlName="password" label="Contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Contraseña"></ion-input>  
           </ion-item>
           
-          <div *ngIf="registraForm.get('password')?.invalid && registraForm.get('password')?.touched">
-            Ingresa una contraseña válida.
+          <div id="error" *ngIf="registraForm.get('password')?.invalid && registraForm.get('password')?.touched">
+            La contraseña pueden contener <br>
+            - Entre 5 a 10 carácteres <br>
+            - minúsculas <br>
+            - MAYÚSCULAS<br>
+            - números<br>
           </div>
 
           <ion-item>
             <ion-input formControlName="password2" label="Confirmar contraseña" label-placement="floating" type="password" fill="undefined" placeholder="Confirmar contraseña"></ion-input>  
           </ion-item>
 
-          <div *ngIf="registraForm.errors?.['passwordMismatch'] && registraForm.get('password2')?.touched">
+          <div id="error" *ngIf="registraForm.errors?.['passwordMismatch'] && registraForm.get('password2')?.touched">
             Las contraseñas no coinciden.
           </div>
 
         </div>
 
-        <div id="error" *ngIf="(registraForm.invalid)">
-          <p>
-            Recuerda ingresar sólo números en la Contraseña
-          </p>
-        </div>
+        
         
         <ion-button id="open-toast" color="warning" shape="round" expand="block" type="submit">Registrar</ion-button>
         <ion-button color="secondary" shape="round" [routerLink]="['/login']" expand="block">Volver</ion-button>
       </ion-card-content>
     </ion-card>
   </form>
+  <div id="error" *ngIf="(registraForm.invalid)">
+    <p>
+      Recuerda Registrarte con tu correo DUOC.
+    </p>
+  </div>
 </ion-content>
 
 <ion-footer>

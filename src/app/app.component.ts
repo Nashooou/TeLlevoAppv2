@@ -36,6 +36,8 @@ import { UsuarioService } from './services/UsuarioService/usuario.service';
 export class AppComponent {
   showMenu: boolean = false;
   isAutenticado: boolean = false;
+  par_nombre: string = "Login";
+
 
   constructor(
     private router: Router,
@@ -59,6 +61,9 @@ export class AppComponent {
   //SE EJECUTA LUEGO DE QUE LA VISTA SE INICIA
   async ngAfterViewInit() {
     const isAutenticado= await this.usuarioService.usuarioAutenticado();
+
+
+    
 
     if(isAutenticado){
       this.showMenu = true
@@ -88,8 +93,8 @@ export class AppComponent {
       });
 
       await this.usuarioService.guardarListaUsuarios(usuarios);
-      window.location.href = '/login';
-      // this.router.navigate(['login']);
+      // window.location.href = '/login';
+      this.router.navigate(['login']);
     }
     else {
       this.showMenu = true;

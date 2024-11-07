@@ -5,6 +5,8 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./login/login.page').then(m => m.LoginPage) },
   { path: 'registro-usuario', loadComponent: () => import('./registro-usuario/registro-usuario.page').then(m => m.RegistroUsuarioPage) },
   { path: 'recuperar-contrasena', loadComponent: () => import('./recuperar-contrasena/recuperar-contrasena.page').then(m => m.RecuperarContrasenaPage) },
+  { path: 'crud-admin', loadComponent: () => import('./pages/crud/crud-admin/crud-admin/crud-admin.page').then( m => m.CrudAdminPage)},
+
 
   {
     path: 'tabs',
@@ -19,13 +21,8 @@ export const routes: Routes = [
       { path: 'buscarviaje', loadComponent: () => import('./pages/buscar-viaje/buscarviaje/buscarviaje.page').then( m => m.BuscarviajePage)},
       { path: 'ver-viaje-detalle', loadComponent: () => import('./pages/crud/verviajedetalle/ver-viaje-detalle/ver-viaje-detalle.page').then( m => m.VerViajeDetallePage)},
       { path: '', redirectTo: 'inicio', pathMatch: 'full' } // Redirige a la página "inicio" por defecto
+
     ]
-  },
+  }
   
-
-  
-
-  
-
-
 ];

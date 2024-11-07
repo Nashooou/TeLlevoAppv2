@@ -24,12 +24,12 @@ declare var google: any;
 })
 export class BuscarviajePage implements OnInit {
 
-  viajes: any[] = []; // Aquí almacenaremos la información de los viajes
+  viajes: any[] = []; 
   nombreConductor: string='';
   usuarioAutenticado: any;
-  viajeSolicitado: string | null = null; // Almacena el ID del viaje solicitado
+  viajeSolicitado: { [key: string]: boolean } = {};
   horaActualChile: string = '';
-  
+  tieneViajeSolicitado: boolean = false;
 
 
   constructor(
@@ -44,35 +44,39 @@ export class BuscarviajePage implements OnInit {
 
 
 
-  ionViewWillEnter() {
-    this.ngOnInit(); // Recarga los datos del mapa y los viajes
+  async ngOnInit() {
+    this.cargarDatosViajes(); // Recarga los datos del mapa y los viajes
   }
   
 
 
-
-  async ngOnInit() {
-    
-    this.actualizarHoraChile();
-
+  
+  async cargarDatosViajes() {
     const usuarios = await this.usuarioService.obtenerUsuarios();
-    this.usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
-
-    
+    this.usuarioAutenticado = usuarios.find(usuario => usuario.autenticado === true);
 
     if (!this.usuarioAutenticado) {
       console.log('No se pudo obtener el usuario autenticado');
       return;
     }
 
-    const todosLosViajes = await this.viajeService.obtenerViajes() || [];
-    this.viajes = todosLosViajes.filter((viaje: Viaje) => viaje.userViaje !== this.usuarioAutenticado.correo);
+    const todosLosViajes = await this.viajeService.obtenerViajes();
+    this.viajes = todosLosViajes.filter(viaje => viaje.userViaje !== this.usuarioAutenticado.correo);
 
+    let viajeSolicitado = false;
+
+    // Verificar si el usuario tiene algún viaje solicitado
     this.viajes.forEach(viaje => {
-      if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
-        this.viajeSolicitado = viaje.destino;
+      const solicitado = viaje.solicitantes?.includes(this.usuarioAutenticado.correo) ?? false;
+      this.viajeSolicitado[viaje.destino] = solicitado;
+
+      if (solicitado) {
+        viajeSolicitado = true;
       }
     });
+
+    // Si hay un viaje solicitado, actualizamos la propiedad `tieneViajeSolicitado`
+    this.tieneViajeSolicitado = viajeSolicitado;
 
     setTimeout(() => {
       this.viajes.forEach((viaje, index) => {
@@ -82,42 +86,15 @@ export class BuscarviajePage implements OnInit {
     }, 0);
   }
 
-
-
-  
-
-  obtenerHoraActualChile(): string {
-    const fechaChile = new Date();
-    const options = {
-      timeZone: 'America/Santiago',
-      hour12: false,
-      hour: '2-digit' as 'numeric',
-      minute: '2-digit' as 'numeric',
-      second: '2-digit' as 'numeric'
-    };
-    return fechaChile.toLocaleTimeString('en-US', options); // Devuelve la hora en formato 24 horas
+  // Verificar si un viaje ha sido solicitado
+  isViajeSolicitado(viaje: any): boolean {
+    return this.viajeSolicitado[viaje.destino] || false;
   }
 
 
 
-
-
-  convertirHoraViaje(viajeHora: string): Date {
-    const [hora, minuto, segundo] = viajeHora.split(':');
-    const ahora = new Date();
-    // Creamos una nueva fecha con la hora y minuto del viaje
-    const fechaViaje = new Date(ahora.setHours(Number(hora), Number(minuto), Number(segundo), 0));
-    
-    return fechaViaje;
-  }
-
-
-
-
-
-  // Método para verificar si el viaje se puede cancelar
+  // Método para verificar si el viaje se puede cancelar (menos de 30 minutos antes de la salida)
   puedeCancelar(viaje: any): boolean {
-    
     const horaActual = new Date();
   
     // Hora de salida del viaje (convertirla a objeto Date)
@@ -142,6 +119,117 @@ export class BuscarviajePage implements OnInit {
   }
 
 
+  async solicitarViaje(viaje: Viaje) {
+    if (viaje.userViaje === this.usuarioAutenticado.correo) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No puedes solicitar tu propio viaje.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ya solicitaste este viaje.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+    if (viaje.asientosDisponibles <= 0) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ya no quedan asientos disponibles.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+
+    viaje.asientosDisponibles--;
+    viaje.solicitantes = viaje.solicitantes || [];
+    viaje.solicitantes.push(this.usuarioAutenticado.correo);
+
+    // Actualizar el estado del viaje solicitado
+    this.viajeSolicitado[viaje.destino] = true;
+    await this.viajeService.guardarListaViajes(this.viajes);
+
+    const toast = await this.toastController.create({
+      message: 'Solicitud realizada exitosamente',
+      duration: 2000,
+      color: 'success',
+      position: 'bottom'
+    });
+    await toast.present();
+
+    this.ngOnInit();
+  }
+
+
+  async cancelarSolicitud(viaje: Viaje) {
+    
+    if (!this.puedeCancelar(viaje)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No puedes cancelar el viaje cuando faltan menos de 30 minutos.',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      return;
+    }
+  
+    
+    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
+      viaje.solicitantes = viaje.solicitantes.filter(correo => correo !== this.usuarioAutenticado.correo);
+      viaje.asientosDisponibles++;  // Liberar un asiento
+
+      
+      this.viajeSolicitado[viaje.destino] = false;
+      await this.viajeService.guardarListaViajes(this.viajes);
+
+      const toast = await this.toastController.create({
+        message: 'Solicitud cancelada exitosamente',
+        duration: 2000,
+        color: 'danger',
+        position: 'bottom'
+      });
+      await toast.present();
+    }
+
+    this.ngOnInit();
+  }
+
+
+ 
+
+  obtenerHoraActualChile(): string {
+    const fechaChile = new Date();
+    const options = {
+      timeZone: 'America/Santiago',
+      hour12: false,
+      hour: '2-digit' as 'numeric',
+      minute: '2-digit' as 'numeric',
+      second: '2-digit' as 'numeric'
+    };
+    return fechaChile.toLocaleTimeString('en-US', options); // Devuelve la hora en formato 24 horas
+  }
+
+
+
+
+
+  convertirHoraViaje(viajeHora: string): Date {
+    const [hora, minuto, segundo] = viajeHora.split(':');
+    const ahora = new Date();
+    const fechaViaje = new Date(ahora.setHours(Number(hora), Number(minuto), Number(segundo), 0));
+    
+    return fechaViaje;
+  }
+
 
 
   dibujarMapa(viaje: any, index: number) {
@@ -156,13 +244,13 @@ export class BuscarviajePage implements OnInit {
           zoom: 15,
         });
 
-        // Dibuja el marcador de destino
+        
         new google.maps.Marker({
           position: { lat, lng },
           map: mapa,
         });
 
-        // Calcular y dibujar la ruta
+        
         this.calcularRuta(viaje, mapa);
       } else {
         console.error('Coordenadas inválidas para el viaje:', viaje);
@@ -199,103 +287,11 @@ export class BuscarviajePage implements OnInit {
     });
   }
 
-
-
-
-
   
-  async solicitarViaje(viaje: Viaje) {
-    if (viaje.userViaje === this.usuarioAutenticado.correo) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No puedes solicitar tu propio viaje.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
-  
-    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Ya solicitaste este viaje.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
-  
-    if (viaje.asientosDisponibles <= 0) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Ya no quedan asientos disponibles.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
-  
-    viaje.asientosDisponibles--;
-    viaje.solicitantes = viaje.solicitantes || [];
-    viaje.solicitantes.push(this.usuarioAutenticado.correo);
-  
-    // Aquí actualizamos los viajes y recalculamos los botones habilitados/deshabilitados
-    await this.viajeService.guardarListaViajes(this.viajes);
-    this.viajeSolicitado = viaje.destino;
-  
-    const toast = await this.toastController.create({
-      message: 'Solicitud realizada exitosamente',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
-    
-    this.ngOnInit();
-  }
-
-
-
-
-
-
-
-  async cancelarSolicitud(viaje: Viaje) {
-
-    if (!this.puedeCancelar(viaje)) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'No puedes cancelar el viaje cuando faltan menos de 30 minutos.',
-        buttons: ['Aceptar'],
-      });
-      await alert.present();
-      return;
-    }
-
-
-    if (viaje.solicitantes?.includes(this.usuarioAutenticado.correo)) {
-      viaje.solicitantes = viaje.solicitantes.filter(
-        (correo) => correo !== this.usuarioAutenticado.correo
-      );
-      viaje.asientosDisponibles++;
-
-      await this.viajeService.guardarListaViajes(this.viajes);
-
-      this.viajeSolicitado = null;
-
-      const toast = await this.toastController.create({
-        message: 'Solicitud cancelada exitosamente',
-        duration: 2000,
-        color: 'danger',
-        position: 'bottom'
-      });
-      await toast.present();
-    }
-  }
 
   actualizarHoraChile() {
     this.horaActualChile = this.obtenerHoraActualChile();
-    console.log('Hora actual de Chile:', this.horaActualChile); // Esto es solo para verificar en consola
+    console.log('Hora actual de Chile:', this.horaActualChile); 
   }
 
   irInicio() {

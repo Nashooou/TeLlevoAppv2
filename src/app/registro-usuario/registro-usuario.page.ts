@@ -32,26 +32,28 @@ export class RegistroUsuarioPage implements OnInit {
     private usuarioService: UsuarioService
   ) {
     this.registraForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+$')]],
-      apellido: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+$')]],
+      nombre: ['', [
+        Validators.required, 
+        Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$')
+      ]],
+      apellido: ['', [
+        Validators.required, 
+        Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$')
+      ]],
       correo: ['', [
         Validators.required,
         Validators.pattern('^[a-zA-Z0-9._%+-]+@duocuc\.cl$'),
       ]],
-      // username: ['', [
-      //   Validators.required,
-      //   Validators.pattern('^[a-zA-Z0-9]+$'),
-      //   Validators.minLength(4),
-      //   Validators.maxLength(8),
-      // ]],
       password: ['', [
         Validators.required,
-        Validators.minLength(4),
+        Validators.minLength(5),
+        Validators.maxLength(10),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]],
       password2: ['', [
         Validators.required,
-        Validators.minLength(4),
+        Validators.minLength(5),
+        Validators.maxLength(10),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]]
     });

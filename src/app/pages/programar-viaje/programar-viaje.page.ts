@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterLink } from '@angular/router';
 import { ViajeService, Viaje } from 'src/app/services/ViajeService/viaje.service';
 import { UsuarioService } from 'src/app/services/UsuarioService/usuario.service';
 import { ToastController } from '@ionic/angular/standalone';
+import { VehiculoService } from 'src/app/services/VehiculoService/vehiculo.service';
 
 //declarar una variable de google
 declare var google:any;
@@ -27,7 +28,7 @@ declare var google:any;
 export class ProgramarViajePage implements OnInit {
   
   programarForm!: FormGroup;
-
+  asientosDisponibles: number[] = [];
 
   // declarar variables de trabajo del mapa
   mapa:any;
@@ -44,11 +45,15 @@ export class ProgramarViajePage implements OnInit {
     private fb: FormBuilder,
     private viajeService: ViajeService,
     private usuarioService: UsuarioService,
+    private vehiculoService: VehiculoService,
     private toastController:ToastController,
     private router: Router
   ) { 
     this.programarForm = this.fb.group({
-      hora: ['', [Validators.required]],
+      hora: ['', [
+        Validators.required,
+        this.validarHoraMinima
+      ]],
       asientosDisponibles: ['', 
         [
           Validators.required, 
@@ -57,15 +62,14 @@ export class ProgramarViajePage implements OnInit {
         ]],
       precio: ['', [
         Validators.required, 
-        Validators.min(0)
+        Validators.min(1)
       ]],
       destino: ['',Validators.required]
     });
   }
 
+
   async onSubmit() {
-
-
 
     if (this.programarForm.valid) {
       // Obtener usuarios desde el servicio
@@ -119,11 +123,40 @@ export class ProgramarViajePage implements OnInit {
   }
 
 
+
+
   ngOnInit() {
     this.dibujarMapa()
     this.buscaDireccion(this.mapa,this.marker)
+    this.cargarAsientosDisponibles();
 
   }
+
+
+
+  private async cargarAsientosDisponibles() {
+
+    const usuarios = await this.usuarioService.obtenerUsuarios();
+    const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
+
+    if(!usuarioAutenticado){
+      console.log('No se encuentran usuarios autenticados')
+      return;
+    }
+
+    const vehiculos = await this.vehiculoService.obtenerVehiculos();
+    const vehiculoUsuario = vehiculos.find(v => v.userPropietario === usuarioAutenticado.correo);
+
+    if (vehiculoUsuario) {
+      const totalAsientos = vehiculoUsuario.asientos;
+      this.asientosDisponibles = Array.from({ length: totalAsientos - 1 }, (_, i) => i + 1);
+    } else {
+      console.error('No se encontró un vehículo para el usuario autenticado');
+    }
+  }
+
+
+
 
   dibujarMapa(){
     var mapElement=document.getElementById('map')
@@ -220,4 +253,33 @@ export class ProgramarViajePage implements OnInit {
     }
 
   }
+
+
+    
+  validarHoraMinima(control: AbstractControl): { [key: string]: any } | null {
+    const horaActual = new Date();
+    const horaIngreso = control.value;
+    
+    
+    if (!horaIngreso) {
+      return null;
+    }
+
+    // Convertir la hora ingresada a un objeto Date
+    const [hora, minuto] = horaIngreso.split(':');
+    const fechaViaje = new Date(horaActual);
+    fechaViaje.setHours(Number(hora), Number(minuto), 0, 0); // Establecer la hora del viaje
+
+    // Validar que el viaje esté al menos 20 minutos en el futuro
+    const diferenciaMinutos = (fechaViaje.getTime() - horaActual.getTime()) / (1000 * 60);
+    
+    if (diferenciaMinutos < 20) {
+      return { 'horaInvalida': true }; // Si la diferencia es menor a 20 minutos
+    }
+
+    return null; // Si pasa la validación
+  }
+
+
+
 }

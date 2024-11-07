@@ -4,7 +4,30 @@
     align-content: center;
     gap: 10px; /* Espacio entre los botones, puedes ajustar este valor */
     margin-top: 20px; /* Espacio superior opcional */
-  }
+}
+
+
+.infoapp {
+  background-color: #007bff48; /* Color de fondo */
+  // padding: 5px;            /* Espaciado interno */
+  // border-radius: 10px;       /* Bordes redondeados */
+  margin: 10px;              /* Espaciado externo */
+  color: white;              /* Color de texto para mejor contraste */
+}
+
+ion-card {
+  border: 1px solid #007bff;
+  border-radius: 8px; 
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.856);
+  margin: 16px;
+  padding: 0;
+}
+
+ion-card-header{
+  margin: 0;
+  padding: 0;
+}
+
 
 #error{
   color: red;

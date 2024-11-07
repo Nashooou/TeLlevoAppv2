@@ -18,10 +18,6 @@
       <ion-card-title>Programa tu regreso a casa</ion-card-title>
     </ion-card-header>
   
-  
-    
-  
-  
     <form [formGroup]="programarForm" (ngSubmit)="onSubmit()">
       
   
@@ -42,17 +38,17 @@
         </ion-item>
         <div id="error" *ngIf="programarForm.get('hora')?.invalid && programarForm.get('hora')?.touched">
           <p *ngIf="programarForm.get('hora')?.errors?.['required']">La hora es requerida.</p>
+          <p *ngIf="programarForm.get('hora')?.errors?.['horaInvalida']">La hora de salida debe ser programada con un mínimo de 20 minutos.</p>
         </div>
   
   
         <ion-label position="floating">Pasajeros Disponibles</ion-label>
         <ion-item>
-          <ion-select formControlName="asientosDisponibles" interface="popover" placeholder="1">
-            <ion-label>Selecciona total de pasajeros para este viaje:</ion-label>
-            <ion-select-option value="1">1</ion-select-option>
-            <ion-select-option value="2">2</ion-select-option>
-            <ion-select-option value="3">3</ion-select-option>
-            <ion-select-option value="4">4</ion-select-option>
+          <ion-select formControlName="asientosDisponibles" interface="popover" placeholder="Selecciona pasajeros">
+            <ion-label>Selecciona el número de pasajeros:</ion-label>
+            <ion-select-option *ngFor="let asiento of asientosDisponibles" [value]="asiento">
+              {{ asiento }}
+            </ion-select-option>
           </ion-select>
         </ion-item>
         <div id="error" *ngIf="programarForm.get('asientosDisponibles')?.invalid && programarForm.get('asientosDisponibles')?.touched">
@@ -69,7 +65,7 @@
         </ion-item>
         <div id="error"  *ngIf="programarForm.get('precio')?.invalid && programarForm.get('precio')?.touched">
           <p *ngIf="programarForm.get('precio')?.errors?.['required']">El precio es requerido.</p>
-          <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio no puede ser negativo.</p>
+          <p *ngIf="programarForm.get('precio')?.errors?.['min']">El precio de viaje debe ser mayor a 0.</p>
         </div>
   
         

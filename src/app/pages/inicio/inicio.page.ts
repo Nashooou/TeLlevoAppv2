@@ -25,6 +25,8 @@ export class InicioPage implements OnInit {
   viajes: any[] = [];
   horaActualChile: string = '';
   private intervalo: any;
+  isAdmin: boolean=false;
+
 
   constructor(
     private router: Router,
@@ -51,14 +53,19 @@ export class InicioPage implements OnInit {
     this.actualizarHoraChile();
     this.intervalo = setInterval(() => this.actualizarHoraChile(), 1000);
 
+    
+
     // Obtener usuarios desde el servicio
     const usuarios = await this.usuarioService.obtenerUsuarios();
     
     // Aquí puedes obtener el nombre del último usuario que inició sesión
     const usuarioAutenticado = usuarios.find((usuario: any) => usuario.autenticado === true);
     
+    //Si no se obtiene el usuario autenticado es por que es admin
     if (!usuarioAutenticado) {
-      console.log('No se pudo obtener el usuario autenticado')
+      this.par_nombre = 'Admin'
+      this.isAdmin = true;
+      
       return;
     }
     // Asignar el atributo a la variable que mostraremos
